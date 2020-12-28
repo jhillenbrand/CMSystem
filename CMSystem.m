@@ -1,45 +1,27 @@
 % @AUTHOR jonas.hillenbrand@kit.edu
 % @VERSION 0.1
-% @DEPENDENCY
-classdef CMSystem < handle
-    %CMSystem
+% @DEPENDENCY CMSystemInterface.m, JLog.m, Transformer.m, Reporter.m, Interventor.m
+% @DATE 28.12.2020
+classdef CMSystem < CMSystemInterface
+    %CMSYSTEM
     
-    %% Logger
+    %% properties
     properties
-        L = JLog();
-    end
-    
-    %% Process Step Objects
-    properties        
-        dataAcquisitionObj = []; % Step 1 - Data Acquisition
-        preprocessingObj = [];  % Step 2 - Preprocessing
-        segmentationObj = [];   % Step 3 - Segmentation
-        featureExtractionObj = [];  % Step 4 - FeatureExtraction        
-        modellingObj = []; % Step 5 - Modelling
-    end
-    
-    %% Strategy Object
-    properties
-        learningStrategyObj = [];
-        monitoringStrategyObj = [];
-    end
-    
-    %% State Properties
-    properties
-        mode = 0;   % [0-1]; 0 --> Learning, 1 --> Monitoring (Live)
-        status = 0; % [0-5]; see Process Steps
-        statusMsg = '';
-        isRunning = false;
+        L = JLog(); 
+        name = '';
+        transformers = [];
+        strategies = [];
+        activeStrategy = [];
+        reporters = [];        
+        interventors = [];
     end
     
     %% Constructor Method
     methods
-        %% - ClusterAnomalyDetection
+        %% - CMSystem
         function obj = CMSystem()
-            %CLUSTERANOMALYDETECTION
+            %CMSYSTEM
             
-            obj.status = 0;
-            obj.statusMsg = 'STEP 0: Instantion';
         end
     end
     
@@ -48,150 +30,60 @@ classdef CMSystem < handle
         
     end
     
-    %% PROCESS METHODS
+    %% Interface Methods
     methods
-        %% - run
-        function run(obj)
-            %RUN(obj)
-            if obj.check()
-                obj.isRunning = true;
-                while (obj.isRunning)
-                    obj.isRunning = obj.nextIteration();
-                end
+        function addTransformer(obj, transformer)
+            if class(Transformer()) == class(transformer)                
+                obj.transformers = [obj.transformers; transformer];
             else
-                error('Method check() failed. Application will not start.')
+                obj.L.log('ERROR', ['transformer must be of type ' class(Transformer())]);
             end
         end
         
-        function bool = nextIteration(obj)
-            switch (obj.mode)
-                case 0
-                    obj.nextLearningIteration();
-                    
-                case 1
-                    obj.nextIterationMonitoring();
-            end                
+        function switchStrategy(obj, strategyName)
+            strategy = obj.getStrategyByName(strategyName);
+            if ~isempty(strategy)
+                obj.activeStrategy = strategy;
+            else
+                obj.L.log('ERROR', ['strategy ' strategyName ' does not exist.']);
+            end
         end
         
-        function bool = nextLearningIteration(obj)
-            obj.status = 1;
-            obj.statusMsg = 'STEP 1: Data Acquisition';
-            acquiredData = obj.acquireData();
-            
-            obj.status = 2;
-            obj.statusMsg = 'STEP 2: Preprocessing';            
-            preprocessedData = obj.preprocessData(acquiredData);
-            
-            obj.status = 3;
-            obj.statusMsg = 'STEP 3: Segmentation';            
-            segmentedData = obj.segmentData(preprocessedData);
-            
-            obj.status = 4;
-            obj.statusMsg = 'STEP 4: Feature Extraction';
-            extractedFeatures = obj.extractFeatures(segmentedData);
-            
-            
-        end
-            
-        function bool = nextIterationMonitoring(obj)
-            %
-            obj.status = 1;
-            obj.statusMsg = 'STEP 1: Data Acquisition';
-            acquiredData = obj.acquireData();
-            
-            obj.status = 2;
-            obj.statusMsg = 'STEP 2: Preprocessing';            
-            preprocessedData = obj.preprocessData(acquiredData);
-            
-            obj.status = 3;
-            obj.statusMsg = 'STEP 3: Segmentation';            
-            segmentedData = obj.segmentData(preprocessedData);
-            
-            obj.status = 4;
-            obj.statusMsg = 'STEP 4: Feature Extraction';
-            extractedFeatures = obj.extractFeatures(segmentedData);
-            
-            obj.status = 5;
-            obj.statusMsg = 'STEP 5: Clustering';
-            clusters = obj.clusterFeatures(extractedFeatures);
-            
-            obj.status = 6;
-            obj.statusMsg = 'STEP 6: Cluster Tracking';
-            trackedClusters = obj.trackClusters(clusters);
-            
-            bool = true;
+        function executeActiveStrategy(obj)
+            obj.activeStrategy.execute(obj);
         end
         
-        %% - switchMode
-        function switchMode(obj, mode)
-            %SWITCHMODE(obj, mode) changes between Learning and Monitoring Mode
-            obj.mode = mode;
+        function addReporter(obj, reporter)
+            if class(Reporter()) == class(reporter)
+                obj.reporters = [obj.reporters; reporter];
+            else
+                obj.L.log('ERROR', ['reporter must be of type ' class(Reporter())]);
+            end
         end
         
-        %% - acquireData
-        function acquiredData = acquireData(obj)
-            %ACQUIREDATA(obj)
-            
-            acquiredData = obj.dataAcquisitionObj.requestAvailableData();
-        end
-        
-        %% - preprocessData
-        function preprocessedData = preprocessData(obj, acquiredData)
-            %PREPROCESSDATA(obj, acquiredData)
-            
-            
-        end
-        
-        %% - segmentData
-        function segmentedData = segmentData(obj, preprocessedData)
-            %SEGMENTDATA(obj, preprocessData)
-        end
-        
-        %% - extractFeatures
-        function extractedFeatures = extractFeatures(obj, segmentedData)
-            %EXTRACTFEATURES(obj, segmentedData)
-        end
-        
-        %% - clusterFeatures
-        function clusters = clusterFeatures(obj, extractedFeatures)
-            %CLUSTERFEATURES(obj, extractedFeatures)
-        end
-        
-        %% - trackClusters
-        function trackedClusters = trackClusters(obj, clusters)
-            %TRACKCLUSTERS(obj, clusters)
+        function addInterventor(obj, interventor)
+            if class(Interventor()) == class(interventor)
+                obj.interventor = [obj.interventor; interventor];
+            else
+                obj.L.log('ERROR', ['interventor must be of type ' class(Interventor())]);
+            end
         end
     end
     
-    %% Private Methods
-    methods (Access = private)
-        %% - check
-        function bool = check(obj)
-            %CHECK(obj) checks if the required process objects are non
-            %   empty
-            if isempty(obj.dataAcquisitionObj)
-                bool = false;
-                return;
+    %% Public Helper Methods
+    methods
+        %% - getStrategyByName
+        function foundStrategy = getStrategyByName(obj, strategyName)
+            %GETSTRATEGYBYNAME(obj, strategyName) returns the strategy
+            %   object within obj.strategies given by name strategyName
+            foundStrategy = [];
+            for s = 1 : length(obj.strategies)
+                strategy = obj.strategies(s);
+                if strcmp(strategy.name, strategyName)
+                    foundStrategy = strategy;
+                    return;
+                end
             end
-            if isempty(obj.featureExtractionObj)
-                bool = false;
-                return;
-            end
-            if isempty(obj.clusteringObj)
-                bool = false;
-                return;
-            end
-            bool = true;
-        end
-    end
-    
-    %% UTILITY Methods
-    methods (Static)
-        %% - showArchitecture
-        function showArchitecture()
-            %SHOWARCHITECTURE
-            img = imread(['res' filesep 'ClusterAnomalyDetection1.png']);
-            imshow(img)
         end
     end
 end

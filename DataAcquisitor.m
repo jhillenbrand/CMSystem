@@ -1,13 +1,17 @@
 % @AUTHOR jonas.hillenbrand@kit.edu
 % @VERSION V0.1
 % @DATE 01.12.2020
-% @DEPENDENCY
-classdef DataAcquisitionInterface < handle
+% @DEPENDENCY DataAcquisitionInterface.m
+classdef DataAcquisitor < DataTransformer & DataAcquisitionInterface
     %DATAACQUISITIONINTERFACE
     
     properties
-        name = '';
-        L = JLog();
+    end
+    
+    methods
+        function obj = DataAcquisitor()
+            obj.name = 'DataAcquisitor1';
+        end
     end
     
     methods (Abstract)
@@ -16,16 +20,6 @@ classdef DataAcquisitionInterface < handle
         
         % returns newData containing newData that is captured for nSamples after method execution
         newData = requestData(obj, nSamples)
-    end
-    
-    methods
-        function log(obj, level, msg)
-            obj.L.log(level, msg);
-        end
-        
-        function append(obj, msg)
-            obj.L.append(msg);
-        end
     end
 end
 

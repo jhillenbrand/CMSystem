@@ -1,23 +1,22 @@
-classdef AnomalyDetectionInterface
-    %ANOMALYDETECTIONINTERFACE Summary of this class goes here
-    %   Detailed explanation goes here
+% @AUTHOR jonas.hillenbrand@kit.edu
+% @VERSION 0.1
+% @DEPENDENCY
+% @DATE: 28.12.2020
+classdef CMSystemInterface < handle
+    %CMSYSTEMINTERFACE 
     
-    properties
-        Property1
-    end
-    
-    methods
-        function obj = AnomalyDetectionInterface(inputArg1,inputArg2)
-            %ANOMALYDETECTIONINTERFACE Construct an instance of this class
-            %   Detailed explanation goes here
-            obj.Property1 = inputArg1 + inputArg2;
-        end
+    %% Abstract Methods    
+    methods (Abstract)
         
-        function outputArg = method1(obj,inputArg)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
-            outputArg = obj.Property1 + inputArg;
-        end
-    end
+        addTransformer(obj, dataTransformer);
+        
+        switchStrategy(obj, strategy);
+        
+        executeActiveStrategy(obj);
+        
+        addInterventor(obj, interventor);
+        
+        addReporter(obj, reporter);        
+    end    
 end
 

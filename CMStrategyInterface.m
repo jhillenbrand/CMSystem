@@ -1,17 +1,12 @@
 % @AUTHOR jonas.hillenbrand@kit.edu
-% @VERSION: 0.1
-% @DATE: 01.12.2020
-% @DEPENDENCY: ClusterAnomalyDetection.m
-classdef AnomalyDetectionStrategyInterface < handle
-    %UNTITLED2 Summary of this class goes here
-    %   Detailed explanation goes here
+% @VERSION 0.1
+% @DEPENDENCY
+% @DATE: 28.12.2020
+classdef CMStrategyInterface < handle
+    %CMSYSTEMINTERFACE
     
-    properties
-        anomalyDetectionObj = [];
-    end
-    
-    methods
-        
+    methods (Abstract)
+        execute(obj, cmSystem);
     end
 end
 
