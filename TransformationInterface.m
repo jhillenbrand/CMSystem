@@ -1,5 +1,5 @@
-classdef TransformInterface < handle
-    %TRANSFORMINTERFACE 
+classdef TransformationInterface < handle
+    %TRANSFORMATIONINTERFACE 
         
     methods (Abstract)
         newData = apply(obj, data)

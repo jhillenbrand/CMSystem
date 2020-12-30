@@ -1,5 +1,5 @@
-classdef PreprocessingTransform < Transform
-    %PREPROCESSINGTRANSFORM 
+classdef AELearningStrategy < CMStrategy
+    %AELEARNINGSTRATEGY
     
     properties
         

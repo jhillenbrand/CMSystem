@@ -6,17 +6,8 @@ classdef CMSystemInterface < handle
     %CMSYSTEMINTERFACE 
     
     %% Abstract Methods    
-    methods (Abstract)
-        
-        addTransformer(obj, dataTransformer);
-        
-        switchStrategy(obj, strategy);
-        
-        executeActiveStrategy(obj);
-        
-        addInterventor(obj, interventor);
-        
-        addReporter(obj, reporter);        
+    methods (Abstract)        
+        start(obj);       
     end    
 end
 

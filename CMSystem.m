@@ -25,12 +25,13 @@ classdef CMSystem < CMSystemInterface
         end
     end
     
-    %% Setup Methods
+    %% Interface Methods
     methods
-        
+        function start(obj)
+            
+        end
     end
     
-    %% Interface Methods
     methods
         function addTransformer(obj, transformer)
             if class(Transformer()) == class(transformer)                

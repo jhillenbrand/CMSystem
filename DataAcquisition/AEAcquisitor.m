@@ -2,7 +2,7 @@
 % @VERSION V0.1
 % @DATE 01.12.2020
 % @DEPENDENCY JavaDux.m
-classdef AEDataAcquisitor < DataAcquisitor
+classdef AEAcquisitor < DataAcquisitor
     %AEDATAACQUISITOR
     
     properties
@@ -17,14 +17,6 @@ classdef AEDataAcquisitor < DataAcquisitor
         function newData = requestData(obj, nSamples)
             %REQUESTDATA(obj, nSamples)
             newData = obj.javaDux.getMeasurement(nSamples);
-        end
-        
-        function update(obj, data)
-            %UPDATE(obj, data)
-            obj.active = true;
-            newData = obj.requestAvailableData();
-            obj.transfer(newData);
-            obj.active = false;
         end
         
         function setJavaDux(obj, javaDux)

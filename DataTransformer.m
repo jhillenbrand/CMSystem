@@ -1,14 +1,15 @@
 % @AUTHOR jonas.hillenbrand@kit.edu
 % @VERSION v1.0 
-% @DEPENDENCY DataTransformationInterface.m
-classdef DataTransformer < DataTransformationInterface
-    %DATATRANSFORMOBJECT 
+% @DEPENDENCY DataTransformerInterface.m
+% @DATE 30.12.2020
+classdef DataTransformer < DataTransformerInterface
+    %DATATRANSFORMER
     
     properties
         L = JLog();
-        name = 'DataTransformer1';
+        name = ['DataTransformer [' char(java.util.UUID.randomUUID().toString()) ']'];
         observers = [];
-        transforms = [];
+        transformations = [];
         active = false;
     end
     
@@ -26,9 +27,9 @@ classdef DataTransformer < DataTransformationInterface
         function newData = transform(obj, data)
             %TRANSFORM(obj, data)
             newData = [];
-            for t = 1 : length(obj.transforms)
-                transform = obj.transforms(t);
-                newData = [newData, transform.apply(data)];
+            for t = 1 : length(obj.transformations)
+                trafo = obj.transformations(t);
+                newData = [newData, trafo.apply(data)];
             end
         end
         
@@ -47,10 +48,22 @@ classdef DataTransformer < DataTransformationInterface
             count = length(obj.observers);
         end
         
-        %% - addTransform
-        function addTransform(obj, transform)
-            %ADDTRANSFORM(obj, transform)
-            obj.transformers = [obj.transformers; transform];
+        %% - addTransformation
+        function addTransformation(obj, trafo)
+            %ADDTRANSFORMATION(obj, transform) adds the passed
+            %   transformation to existing transformations
+            if (contains(superclasses(trafo), class(Transformation)) | isa(trafo, class(Transformation)))
+                obj.transformations = [obj.transformations; trafo];
+            else
+                error(['trafo was not of type ' class(Transformation)])
+            end
+        end
+        
+        %% - addObserver
+        function addObserver(obj, observer)
+            %ADDOBSERVER(obj, observer) adds the passed observer to existing observer
+            %   collection
+            obj.observers = [obj.observers; observer];
         end
     end
 end

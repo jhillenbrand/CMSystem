@@ -21,8 +21,9 @@ classdef DefaultFeatureExtractor < FeatureExtractor
         transformToEnergy = false;
         transformToBinnedEntropy = false;
         transformToSkewness = false;
-        transformToMeanFrequency = false;
+        transformToMeanFrequency = true;
         transformToCenterFrequency = false;
+        transformToCountZeroCrossings = false;
     end
     
     %% Class Methods
@@ -30,84 +31,91 @@ classdef DefaultFeatureExtractor < FeatureExtractor
         %% - DefaultFeatureExtractor
         function obj = DefaultFeatureExtractor(sampleRate)
             %DEFAULTFEATUREEXTRACTOR(sampleRate)
+            obj.name = ['DefaultFeatureExtractor [' char(java.util.UUID.randomUUID().toString()) ']'];
+            if nargin < 1
+                sampleRate = 0;
+            end
             obj.sampleRate = sampleRate;
-            obj.initFeatureTransforms();
+            obj.initFeatureTransformations();
         end
         
-        %% - initFeatureTransforms
-        function initFeatureTransforms(obj)
+        %% - initFeatureTransformations
+        function initFeatureTransformations(obj)
             %INITFEATURETRANSFORMS(obj)
+            
+            % delete all previous transformations
+            obj.transformations = [];
             if obj.transformToRMS
-                transform = FeatureTransform(@rms, 'RMS');
-                obj.addTransform(transform);
+                transformation = FeatureTransformation(@rms, 'RMS');
+                obj.addTransformation(transformation);
             end
             if obj.transformToMin
-                transform = FeatureTransform(@min, 'MIN');
-                obj.addTransform(transform);
+                transformation = FeatureTransformation(@min, 'MIN');
+                obj.addTransformation(transformation);
             end
             if obj.transformToMax
-                transform = FeatureTransform(@max, 'MAX');
-                obj.addTransform(transform);
+                transformation = FeatureTransformation(@max, 'MAX');
+                obj.addTransformation(transformation);
             end
             if obj.transformToMean
-                transform = FeatureTransform(@mean, 'MEAN');
-                obj.addTransform(transform);
+                transformation = FeatureTransformation(@mean, 'MEAN');
+                obj.addTransformation(transformation);
             end
             if obj.transformToPeakFactor
-                transform = FeatureTransform(@SignalAnalysis.peakFactor, 'PEAKFACTOR');
-                obj.addTransform(transform);
+                transformation = FeatureTransformation(@SignalAnalysis.peakFactor, 'PEAKFACTOR');
+                obj.addTransformation(transformation);
             end
             if obj.transformToStd
-                transform = FeatureTransform(@std, 'STD');
-                obj.addTransform(transform);
+                transformation = FeatureTransformation(@std, 'STD');
+                obj.addTransformation(transformation);
             end                        
             if obj.transformToPeak2Peak
-                transform = FeatureTransform(@SignalAnalysis.peak2Peak, 'PEAK2PEAK');
-                obj.addTransform(transform);
+                transformation = FeatureTransformation(@SignalAnalysis.peak2Peak, 'PEAK2PEAK');
+                obj.addTransformation(transformation);
             end 
             if obj.transformToImpulseFactor
-                transform = FeatureTransform(@SignalAnalysis.impulseFactor, 'IMPULSEFACTOR');
-                obj.addTransform(transform);
+                transformation = FeatureTransformation(@SignalAnalysis.impulseFactor, 'IMPULSEFACTOR');
+                obj.addTransformation(transformation);
             end
             if obj.transformToCrestFactor
-                transform = FeatureTransform(@SignalAnalysis.crestFactor, 'CRESTFACTOR');
-                obj.addTransform(transform);
+                transformation = FeatureTransformation(@SignalAnalysis.crestFactor, 'CRESTFACTOR');
+                obj.addTransformation(transformation);
             end
             if obj.transformToKurtosisFactor
-                transform = FeatureTransform(@SignalAnalysis.kurtosis, 'KURTOSISFACTOR');
-                obj.addTransform(transform);
+                transformation = FeatureTransformation(@SignalAnalysis.kurtosis, 'KURTOSISFACTOR');
+                obj.addTransformation(transformation);
             end
             if obj.transformToFormFactor
-                transform = FeatureTransform(@SignalAnalysis.formFactor, 'FORMFACTOR');
-                obj.addTransform(transform);
+                transformation = FeatureTransformation(@SignalAnalysis.formFactor, 'FORMFACTOR');
+                obj.addTransformation(transformation);
             end
             if obj.transformToMarginFactor
-                transform = FeatureTransform(@SignalAnalysis.marginFactor, 'MARGINFACTOR');
-                obj.addTransform(transform);
+                transformation = FeatureTransformation(@SignalAnalysis.marginFactor, 'MARGINFACTOR');
+                obj.addTransformation(transformation);
             end
             if obj.transformToEnergy
-                transform = FeatureTransform(@SignalAnalysis.getEnergy, 'ENERGY');
-                obj.addTransform(transform);
+                transformation = FeatureTransformation(@SignalAnalysis.getEnergy, 'ENERGY');
+                obj.addTransformation(transformation);
             end
             if obj.transformToBinnedEntropy
-                transform = FeatureTransform(@SignalAnalysis.getEntropy, 'BINNEDENTROPY');
-                obj.addTransform(transform);                
+                transformation = FeatureTransformation(@SignalAnalysis.getEntropy, 'BINNEDENTROPY');
+                obj.addTransformation(transformation);                
             end
             if obj.transformToSkewness
-                transform = FeatureTransform(@skewness, 'SKEWNESS');
-                obj.addTransform(transform);                
+                transformation = FeatureTransformation(@skewness, 'SKEWNESS');
+                obj.addTransformation(transformation);                
             end
             if obj.transformToMeanFrequency
-                transform = FeatureTransform(@(x)meanfreq(x, obj.sampleRate), 'MEANFREQUENCY');
-                obj.addTransform(transform);                
+                transformation = FeatureTransformation(@(x)meanfreq(x, obj.sampleRate), 'MEANFREQUENCY');
+                obj.addTransformation(transformation);                
             end
             if obj.transformToCenterFrequency
-                transform = FeatureTransform(@(x)SignalAnalysis.centroidFrequency(x, obj.sampleRate), 'CENTERFREQUENCY');
-                obj.addTransform(transform);                
+                transformation = FeatureTransformation(@(x)SignalAnalysis.centroidFrequency(x, obj.sampleRate), 'CENTERFREQUENCY');
+                obj.addTransformation(transformation);                
             end
             if obj.transformToCountZeroCrossings
-                transform = FeatureTransform(@SignalAnalysis.countZeroCrossings, 'COUNTZEROCROSSINGS');
-                obj.addTransform(transform);  
+                transformation = FeatureTransformation(@SignalAnalysis.countZeroCrossings, 'COUNTZEROCROSSINGS');
+                obj.addTransformation(transformation);  
             end
         end
     end
