@@ -20,5 +20,6 @@ fwSeg.addObserver(ex);
 ex.addObserver(plotter);
 
 %%
-
-rsDAQ.update();
+while (true)
+    rsDAQ.update();
+end

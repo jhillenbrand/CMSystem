@@ -21,7 +21,12 @@ classdef Transformation < TransformationInterface
             if ~isempty(funcHandle)
                 % attempt to get outputsize for n x 1 vector            
                 r = rand(100, 1);
-                obj.outputDim = size(funcHandle(r));
+                try 
+                    obj.outputDim = size(funcHandle(r));
+                catch e
+                    warning(e.message)
+                    warning(['could not execute Transformation with function handle [' func2str(funcHandle) ']'])
+                end
             end
         end
         

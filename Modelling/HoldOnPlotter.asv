@@ -74,34 +74,29 @@ classdef HoldOnPlotter < Modeler
             obj.holdOnCount = obj.holdOnCount + 1;
         end
         
-        function plot2TimeSeries(obj, data)            
-            data1 = data(:, 1);
-            data2 = data(:, 2);
+        function plot2TimeSeries(obj, data)
+            
             if obj.maxHoldOn > obj.holdOnCount                    
                 x = obj.xIndex + 1 : 1 : obj.xIndex + size(data, 1);
                 x = x(:);
+                data1 = data(:, 1);
+                data2 = data(:, 2);
                 hold on                    
-                yyaxis left
-                plot(x, data1, '-o-', 'Color', P.bluegreen)
-                yyaxis right
-                plot(x, data2, '-*-', 'Color', P.red)
-                hold off
-                drawnow 
-            else
-                obj.xIndex = 0;
-                x = obj.xIndex + 1 : 1 : obj.xIndex + size(data, 1);
                 yyaxis left
                 plot(x, data1, 'Color', P.bluegreen)
                 yyaxis right
                 plot(x, data2, 'Color', P.red)
-                box on
-                grid on
-                grid minor
+                hold off
+                drawnow 
+            else
+                obj.xIndex = 0;
+                x = obj.xIndex + 1 : 1 : obj.xIndex + length(data);
+                plot(x, data, 'Color', P.bluegreen)
                 drawnow
                 obj.holdOnCount = 0;                
             end
             obj.holdOnCount = obj.holdOnCount + 1;
-            obj.xIndex = obj.xIndex + size(data, 1);
+            obj.xIndex = obj.xIndex + length(data);
         end
         
         function plot3D(obj, data)  

@@ -1,0 +1,32 @@
+classdef AutoEncoderExtractor < FeatureExtractor
+    %AUTOENCODEREXTRACTOR 
+    
+    properties
+        myAutoencoder = MyAutoencoder();
+        isTrained = false;
+        sampleRate = 2e6;   % sample rate of data to be processed [Hz]
+        fRes = 100; % targeted frequency resolution [Hz]
+    end
+    
+    methods
+        function obj = AutoEncoderExtractor(sampleRate, fRes)
+            if nargin < 1
+                sampleRate = 2e6;
+            end
+            if nargin < 2
+                fRes = 100;
+            end
+            obj.fRes = fRes;
+            obj.sampleRate = sampleRate;
+        end
+        
+        function setMyAutoEncoder(obj, myAutoencoder)
+            obj.myAutoencoder = myAutoencoder;
+        end
+        
+        function learn(obj, data)
+            n_Hidden = myAutoencoder.estimateHiddenNeuronsWithFrequencyDomain(data, obj.sampleRate
+        end
+    end
+end
+
