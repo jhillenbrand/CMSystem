@@ -1,5 +1,5 @@
 % @AUTHOR jonas.hillenbrand@kit.edu
-% @VERSION v1.0 
+% @VERSION 1.0 
 % @DEPENDENCY DataTransformerInterface.m
 % @DATE 30.12.2020
 classdef DataTransformer < DataTransformerInterface

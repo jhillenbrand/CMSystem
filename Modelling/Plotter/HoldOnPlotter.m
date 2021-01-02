@@ -1,41 +1,48 @@
-classdef HoldOnPlotter < Modeler
+classdef HoldOnPlotter < Plotter
     %PLOTTER 
     
     properties
-        F = []; % figure variable
         maxHoldOn = 100;
-        holdOnCount = 101;
-        xIndex = 0;
+        holdOnCount = 0;
     end
     
     methods
         function obj = HoldOnPlotter()
-            %PLOTTER
-            obj.F = figure();
+            %HOLDONPLOTTER
+            obj@Plotter();
+            % preset holdOnCount to maxHoldOn to make sure plot is cleaned
+            %   on first plot cmd
+            obj.holdOnCount = obj.maxHoldOn + 1;
         end
-        
-        function newData = transform(obj, data)
-            newData = data;
-        end
-        
+    end
+    
+    %% Interface Methods
+    methods
         function transfer(obj, data)
-            obj.F;            
-            if sum(size(data) == 1) == 1
+            % set focus to the figure
+            obj.F;
+            % data is assumed to be n x m, where n is the number of samples
+            % and m the number fo features
+            if size(data, 2) == 1
+                % 1D data must be a column vector n x 1
                 obj.plot1D(data);
-            elseif size(data, 1) > 1 && size(data, 2) == 2
-                if size(data(:, 1), 1) == size(data(:, 2), 1) 
-                    obj.plot2TimeSeries(data)
-                else
-                    obj.plot2D(data);
-                end
-            elseif  size(data, 1) > 1 && size(data, 2) == 3
+            elseif size(data, 2) == 2
+                % 2D data must be a column vector n x 2
+                obj.plot2D(data);
+            elseif  size(data, 2) == 3
+                % 3D data must be a column vector n x 3
                 obj.plot3D(data);
+            else
+                error(['undefined data dimensions for ' class(HoldOnPlotter)])
             end
         end
-        
+    end
+    
+    %% Plotting methods
+    methods        
         function plot1D(obj, data)
             if obj.maxHoldOn > obj.holdOnCount                    
-                x = obj.xIndex + 1 : 1 : obj.xIndex + length(data);
+                x = obj.numOfDataPoints + 1 : 1 : obj.numOfDataPoints + length(data);
                 x = x(:);
                 data = data(:);
                 hold on                    
@@ -43,14 +50,14 @@ classdef HoldOnPlotter < Modeler
                 hold off
                 drawnow 
             else
-                obj.xIndex = 0;
-                x = obj.xIndex + 1 : 1 : obj.xIndex + length(data);
+                obj.numOfDataPoints = 0;
+                x = obj.numOfDataPoints + 1 : 1 : obj.numOfDataPoints + length(data);
                 plot(x, data, 'Color', P.bluegreen)
                 drawnow
                 obj.holdOnCount = 0;                
             end
             obj.holdOnCount = obj.holdOnCount + 1;
-            obj.xIndex = obj.xIndex + length(data);
+            obj.numOfDataPoints = obj.numOfDataPoints + length(data);
         end
         
         function plot2D(obj, data)  
@@ -78,7 +85,7 @@ classdef HoldOnPlotter < Modeler
             data1 = data(:, 1);
             data2 = data(:, 2);
             if obj.maxHoldOn > obj.holdOnCount                    
-                x = obj.xIndex + 1 : 1 : obj.xIndex + size(data, 1);
+                x = obj.numOfDataPoints + 1 : 1 : obj.numOfDataPoints + size(data, 1);
                 x = x(:);
                 hold on                    
                 yyaxis left
@@ -88,8 +95,8 @@ classdef HoldOnPlotter < Modeler
                 hold off
                 drawnow 
             else
-                obj.xIndex = 0;
-                x = obj.xIndex + 1 : 1 : obj.xIndex + size(data, 1);
+                obj.numOfDataPoints = 0;
+                x = obj.numOfDataPoints + 1 : 1 : obj.numOfDataPoints + size(data, 1);
                 yyaxis left
                 plot(x, data1, 'Color', P.bluegreen)
                 yyaxis right
@@ -101,7 +108,7 @@ classdef HoldOnPlotter < Modeler
                 obj.holdOnCount = 0;                
             end
             obj.holdOnCount = obj.holdOnCount + 1;
-            obj.xIndex = obj.xIndex + size(data, 1);
+            obj.numOfDataPoints = obj.numOfDataPoints + size(data, 1);
         end
         
         function plot3D(obj, data)  

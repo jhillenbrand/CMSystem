@@ -1,3 +1,7 @@
+% AUTHOR jonas.hillenbrand@kit.edu
+% VERSION 0.1
+% DATE 02.01.2021
+% DEPENDENCY TransformationInterface.m
 classdef Transformation < TransformationInterface
     %TRANSFORMATION 
     
