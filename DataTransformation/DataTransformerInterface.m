@@ -1,7 +1,7 @@
 % @AUTHOR jonas.hillenbrand@kit.edu
 % @VERSION v1.0 
 % @DEPENDENCY 
-classdef DataTransformerInterface < handle
+classdef DataTransformerInterface < matlab.mixin.Heterogeneous & handle
     %DATATRANSFORMERINTERFACE 
     
     methods (Abstract)

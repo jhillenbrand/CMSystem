@@ -7,9 +7,9 @@ classdef DataTransformer < DataTransformerInterface
     
     properties
         L = JLog();
-        name = ['DataTransformer [' char(java.util.UUID.randomUUID().toString()) ']'];
-        observers = [];
-        transformations = [];
+        name = [class(DataTransformer.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'];
+        observers = DataTransformer.empty();
+        transformations = Transformation.empty();
         active = false;
     end
     
@@ -52,10 +52,10 @@ classdef DataTransformer < DataTransformerInterface
         function addTransformation(obj, trafo)
             %ADDTRANSFORMATION(obj, transform) adds the passed
             %   transformation to existing transformations
-            if (contains(superclasses(trafo), class(Transformation)) | isa(trafo, class(Transformation)))
+            if (contains(superclasses(trafo), class(Transformation.empty)) | isa(trafo, class(Transformation.empty)))
                 obj.transformations = [obj.transformations; trafo];
             else
-                error(['trafo was not of type ' class(Transformation)])
+                error(['trafo was not of type ' class(Transformation.empty)])
             end
         end
         

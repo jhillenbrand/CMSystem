@@ -31,7 +31,7 @@ classdef DefaultFeatureExtractor < FeatureExtractor
         %% - DefaultFeatureExtractor
         function obj = DefaultFeatureExtractor(sampleRate)
             %DEFAULTFEATUREEXTRACTOR(sampleRate)
-            obj.name = ['DefaultFeatureExtractor [' char(java.util.UUID.randomUUID().toString()) ']'];
+            obj.name = [class(DefaultFeatureExtractor.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'];
             if nargin < 1
                 sampleRate = 0;
             end

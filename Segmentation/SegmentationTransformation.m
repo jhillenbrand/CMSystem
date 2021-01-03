@@ -1,4 +1,6 @@
-
+% @AUTHOR jonas.hillenbrand@kit.edu
+% @VERSION v1.0 
+% @DEPENDENCY Transformation.m
 classdef SegmentationTransformation < Transformation
     %SEGMENTATIONTRANSFORMATION
     

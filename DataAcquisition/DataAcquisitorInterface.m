@@ -2,7 +2,7 @@
 % @VERSION V0.1
 % @DATE 01.12.2020
 % @DEPENDENCY
-classdef DataAcquisitorInterface < DataTransformerInterface
+classdef DataAcquisitorInterface < handle
     %DATAACQUISITORINTERFACE
         
     methods (Abstract)

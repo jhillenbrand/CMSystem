@@ -15,7 +15,7 @@ classdef Transformation < TransformationInterface
         function obj = Transformation(funcHandle, name)
             %TRANSFORMATION(name, funcHandle)
             if nargin < 2
-                name = ['Transformation [' char(java.util.UUID.randomUUID().toString()) ']'];
+                name = [class(Transformation.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'];
             end
             if nargin < 1
                 funcHandle = [];
@@ -29,7 +29,7 @@ classdef Transformation < TransformationInterface
                     obj.outputDim = size(funcHandle(r));
                 catch e
                     warning(e.message)
-                    warning(['could not execute Transformation with function handle [' func2str(funcHandle) ']'])
+                    warning(['could not execute ' class(Transformation.empty) ' with function handle [' func2str(funcHandle) ']'])
                 end
             end
         end

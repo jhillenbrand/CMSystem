@@ -20,7 +20,7 @@ classdef HoldOnPlotter < Plotter
     methods
         function transfer(obj, data)
             % set focus to the figure
-            obj.F;
+            figure(obj.F);
             % data is assumed to be n x m, where n is the number of samples
             % and m the number fo features
             if size(data, 2) == 1

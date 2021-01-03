@@ -11,14 +11,14 @@ classdef ClusterBoundaryTrackingModeler < Modeler
         end
         
         function setClusterBoundaryTracker(obj, clusterBoundaryTrackingObj)
-           obj.clusterBoundaryTrackerObj = clusterBoundaryTrackingObj; 
+           obj.clusterBoundaryTrackingObj = clusterBoundaryTrackingObj; 
         end
         
         function setDefault(obj)
             cbt = ClusterBoundaryTracking();
             
             cbt.hyperparameters.KeepDataPoints = true;
-            cbt.hyperparameters.PlotClusterState = false;
+            cbt.hyperparameters.DisplayClusterState = false;
             cbt.hyperparameters.ClusterEachIteration = false;
             
             %cbt.setClusterMethod();
@@ -32,8 +32,10 @@ classdef ClusterBoundaryTrackingModeler < Modeler
         %% - transform
         function newData = transform(obj, data)
             %TRANSFORM(obj, data)
-            obj.clusterBoundaryTrackerObj.processNewData(data);
-            newData = obj.clusterBoundaryTrackingObj.clusterTransitions(end);
+            obj.clusterBoundaryTrackingObj.processNewData(data);
+            % return the whole clusterBoundaryTrackingObj for connected
+            %   observers, logic is contained in connected observers
+            newData = obj.clusterBoundaryTrackingObj;
         end
     end
 end

@@ -22,7 +22,7 @@ classdef AutoencoderExtractor < FeatureExtractor & LearnableInterface
             obj.fRes = fRes;
             obj.sampleRate = sampleRate;
             funcHandle = @(x)obj.predictMSE(x);
-            transformation = Transformation(funcHandle, ['Autoencoder MSE Transformation [' char(java.util.UUID.randomUUID().toString()) ']']);
+            transformation = Transformation(funcHandle, ['Autoencoder MSE ' class(Transformation.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']']);
             obj.addTransformation(transformation);
         end
         
