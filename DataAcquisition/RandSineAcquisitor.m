@@ -1,7 +1,7 @@
 % @AUTHOR jonas.hillenbrand@kit.edu
-% @VERSION V0.1
+% @VERSION 0.1
 % @DATE 01.12.2020
-% @DEPENDENCY JavaDux.m
+% @DEPENDENCY
 classdef RandSineAcquisitor < DataAcquisitor
     %RANDSINEACQUISITOR
     
@@ -25,7 +25,7 @@ classdef RandSineAcquisitor < DataAcquisitor
         
         function newData = requestAvailableData(obj)
             %REQUESTAVAILABLEDATA(obj)
-            newData = obj.createRandSines();
+            newData = obj.createRandSines(e);
         end
         
         function newData = requestData(obj, nSamples)

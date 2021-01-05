@@ -33,7 +33,7 @@ classdef AutoencoderExtractor < FeatureExtractor & LearnableInterface
         %% - defaultLearn
         function defaultLearn(obj, data)
             n_Hidden = MyAutoencoder.estimateHiddenNeuronsWithFrequencyDomain(data, obj.sampleRate, [], [], 'autoThresholdMethod', 'bins', 'ShowPlot', 'progress', 'transform', 'autoAveragedLinear', 'verbose', true, 'NewFigure', true);
-            epochs =1000;
+            epochs = 1000;
             lambda = 0.001;
             beta = 0;
             decTransFcn = 'purelin';

@@ -6,6 +6,9 @@ rsDAQ = RandSineAcquisitor();
 prePro = DefaultPreprocessor();
 
 %%
+plotter3 = HoldOnPlotter();
+
+%%
 fwSeg = FixedWindowSegmenter(1000);
 
 %%
@@ -21,6 +24,7 @@ plotter2 = ClusterStatePlotter();
 %%
 rsDAQ.addObserver(prePro);
 prePro.addObserver(fwSeg);
+prePro.addObserver(plotter3);
 fwSeg.addObserver(ex);
 ex.addObserver(clusterModeler);
 clusterModeler.addObserver(plotter1);
