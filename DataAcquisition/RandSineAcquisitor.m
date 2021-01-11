@@ -25,7 +25,7 @@ classdef RandSineAcquisitor < DataAcquisitor
         
         function newData = requestAvailableData(obj)
             %REQUESTAVAILABLEDATA(obj)
-            newData = obj.createRandSines(e);
+            newData = obj.createRandSines();
         end
         
         function newData = requestData(obj, nSamples)
