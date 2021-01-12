@@ -32,19 +32,19 @@ classdef AutoencoderExtractor < FeatureExtractor & LearnableInterface
                 
         %% - defaultLearn
         function defaultLearn(obj, data)
-            n_Hidden = MyAutoencoder.estimateHiddenNeuronsWithFrequencyDomain(data, obj.sampleRate, [], [], 'autoThresholdMethod', 'bins', 'ShowPlot', 'progress', 'transform', 'autoAveragedLinear', 'verbose', true, 'NewFigure', true);
+            n_Hidden = 7;%MyAutoencoder.estimateHiddenNeuronsWithFrequencyDomain(data, obj.sampleRate, [], [], 'autoThresholdMethod', 'bins', 'ShowPlot', 'progress', 'transform', 'autoAveragedLinear', 'verbose', true, 'NewFigure', true);
             epochs = 1000;
             lambda = 0.001;
             beta = 0;
             decTransFcn = 'purelin';
             normalizeInput = 'mapminmaxAll';
-            obj.autoencoder = MyAutoencoder.train(X_Train',[], n_Hidden, 'MaxEpochs', epochs, 'L2WeightRegularization', lambda, 'SparsityRegularization', beta, 'DecoderTransferFunction', decTransFcn, 'normalizeInput', normalizeInput);                        
+            obj.autoencoder = MyAutoencoder.train(data',[], n_Hidden, 'MaxEpochs', epochs, 'L2WeightRegularization', lambda, 'SparsityRegularization', beta, 'DecoderTransferFunction', decTransFcn, 'normalizeInput', normalizeInput);                        
         end
                          
         %% - predictMSE
         function newData = predictMSE(obj, data)
-            data_Pred = predict(obj.autoencoder, data);
-            newData = mean(SignalAnalysis.getMSE(data, data_Pred, 2));
+            data_Pred = predict(obj.autoencoder, data');
+            newData = mean(SignalAnalysis.getMSE(data, data_Pred', 2));
         end
     end
     
