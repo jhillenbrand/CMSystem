@@ -1,12 +1,13 @@
 % AUTHOR jonas.hillenbrand@kit.edu
-% VERSION 0.1
-% DATE 19.04.2020
-% DEPENDENCY Deep Learning Toolbox (trainautoencoder), Signal Processing Toolbox (findpeaks), MyAutoencoder.m, SignalAnalysis.m
+% VERSION 0.2
+% DATE 29.01.2021
+% DEPENDENCY Deep Learning Toolbox (trainautoencoder), Signal Processing Toolbox (findpeaks), MyAutoencoder.m, PeakFinder.m
 classdef AutoencoderExtractor < FeatureExtractor & LearnableInterface
     %AUTOENCODEREXTRACTOR 
     
     properties
         autoencoder = [];
+        peakFinder = [];
         sampleRate = 2e6;   % sample rate of data to be processed [Hz]
         fRes = 100; % targeted frequency resolution [Hz]
     end
@@ -24,6 +25,14 @@ classdef AutoencoderExtractor < FeatureExtractor & LearnableInterface
             funcHandle = @(x)obj.predictMSE(x);
             transformation = Transformation(funcHandle, ['Autoencoder MSE ' class(Transformation.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']']);
             obj.addTransformation(transformation);
+            
+            % init autoencoder and peakfinder
+            obj.setDefaultPeakFinder();
+            obj.setDefaultAutoencoder();
+        end
+           
+        function setPeakFinder(obj, peakFinder)
+            obj.peakFinder = peakFinder;
         end
         
         function setAutoencoder(obj, autoencoder)
@@ -31,15 +40,41 @@ classdef AutoencoderExtractor < FeatureExtractor & LearnableInterface
         end
                 
         %% - defaultLearn
-        function defaultLearn(obj, data)
-            n_Hidden = 7;%MyAutoencoder.estimateHiddenNeuronsWithFrequencyDomain(data, obj.sampleRate, [], [], 'autoThresholdMethod', 'bins', 'ShowPlot', 'progress', 'transform', 'autoAveragedLinear', 'verbose', true, 'NewFigure', true);
-            epochs = 1000;
-            lambda = 0.001;
-            beta = 0;
-            decTransFcn = 'purelin';
-            normalizeInput = 'mapminmaxAll';
-            obj.autoencoder = MyAutoencoder.train(data',[], n_Hidden, 'MaxEpochs', epochs, 'L2WeightRegularization', lambda, 'SparsityRegularization', beta, 'DecoderTransferFunction', decTransFcn, 'normalizeInput', normalizeInput);                        
+        function defaultLearn(obj, data)            
+            %[numOfHiddenNeurons, maxNumOfHiddenNeurons, minNumOfHiddenNeurons] = obj.autoencoder.estimateHiddenNeuronsWithFrequencyDomain(obj.peakFinder, data);
+            %obj.autoencoder.setHiddenWidth(numOfHiddenNeurons);            
+            obj.autoencoder.estimateHiddenNeuronsWithFrequencyDomain(obj.peakFinder, data);
+            obj.autoencoder.train(data);
         end
+            
+        function setDefaultPeakFinder(obj)
+            obj.peakFinder = PeakFinder(obj.sampleRate, obj.fRes, obj.fRes);
+            obj.peakFinder.setFourierTransformOptions('fft');
+            obj.peakFinder.setThresholdOptions('std-all');
+        end
+        
+        function setDefaultAutoencoder(obj)
+            obj.autoencoder = MyDeepAutoencoder(6, 1);
+            obj.setDefaultLearnOptions();
+        end
+        
+        function setDefaultLearnOptions(obj)
+            obj.autoencoder.setTrainingOptions(...
+                'Verbose', false, ...
+                'VerboseFrequency', 60, ...
+                'InitialLearnRate', 0.01, ...
+                'LearnRateSchedule', 'piecewise', ...
+                'LearnRateDropPeriod', 40, ...
+                'LearnRateDropFactor', 0.2, ...
+                'GradientDecayFactor', 0.8, ...
+                'SquaredGradientDecayFactor', 0.8, ...
+                'Epsilon', 2e-8, ...
+                'MaxEpochs', 4000, ...
+                'Shuffle', 'every-epoch', ...
+                'L2Regularization', 0.01, ...
+                'ValidationPatience', 10, ...
+                'Plots', 'training-progress');
+        end 
                          
         %% - predictMSE
         function newData = predictMSE(obj, data)

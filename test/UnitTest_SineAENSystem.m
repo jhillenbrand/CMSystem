@@ -2,9 +2,11 @@
 clear
 close all
 clc
+%%
+f_sr = 100;
 
 %%
-sgAcq = SineGenAcquisitor(300, 100);
+sgAcq = SineGenAcquisitor(300, f_sr);
 sgAcq.f1 = 1;
 sgAcq.f2 = 2;
 sgAcq.a1 = 1.75;
@@ -13,7 +15,8 @@ sgAcq.no1 = 0.25;
 sgAcq.no2 = 0.25;
 
 %% 
-subPlotter = HoldOnSubPlotter(1);
+%subPlotter = HoldOnSubPlotter(1);
+subPlotter = MovingWindowPlotter(10000);
 
 %%
 sgAcq.addObserver(subPlotter);
@@ -32,7 +35,7 @@ while w < numOfWindows
 end
 
 %% learn
-aenEx = AutoencoderExtractor();
+aenEx = AutoencoderExtractor(f_sr, 0.5);
 aenEx.defaultLearn(XTrain');
 
 %% reconstruction example
