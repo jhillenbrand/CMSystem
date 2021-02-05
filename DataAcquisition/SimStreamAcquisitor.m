@@ -9,28 +9,29 @@ classdef SimStreamAcquisitor < DataAcquisitor
         files
         bufferSize
         stepSize
-        DataStream
+        dataStream
     end
     
     methods
-        function obj = SimStreamAcquisitor(files,bufferSize,stepSize)
+        function obj = SimStreamAcquisitor(dataParserObj, files, bufferSize, stepSize)
             obj@DataAcquisitor(0, true);
             if nargin > 0
                 obj.files = files;
                 obj.bufferSize = bufferSize;
                 obj.stepSize = stepSize;
             end
-            DataParserObj = DataParser();
-            obj.DataStream = SimulateDataStream_v2(DataParserObj,obj.files,obj.bufferSize,obj.stepSize);
+            obj.dataStream = SimulateDataStream_v2(dataParserObj, obj.files, obj.bufferSize, obj.stepSize);
         end
         
         function newData = requestAvailableData(obj)
             %REQUESTAVAILABLEDATA(obj)
-            newData = obj.DataStream.getNextTimeStep();
+            newData = obj.dataStream.getNextTimeStep();
         end
         
         function newData = requestData(obj, nSamples)
             %REQUESTDATA(obj, nSamples)
+            warning(['method requestData is not implemented for ' class(SimStreamAcquisitor.Empty) ', method requestAvailableData is used instead'])
+            newData = obj.requestAvailableData();
         end
         
     end
