@@ -8,9 +8,14 @@ classdef Plotter < Modeler
     
     methods
         %% - Plotter
-        function obj = Plotter()
+        function obj = Plotter(noFigure)
             %PLOTTER
-            obj.F = figure();
+            if nargin < 1
+                noFigure = false;
+            end
+            if ~noFigure                
+                obj.F = figure();
+            end
         end
         
         function setFigure(obj, fig)

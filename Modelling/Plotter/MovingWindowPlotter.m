@@ -7,20 +7,32 @@ classdef MovingWindowPlotter < Plotter
     end
     
     methods
-        function obj = MovingWindowPlotter(maxWindowSize)
+        function obj = MovingWindowPlotter(noFigure, maxWindowSize)
             %MOVINGWINDOWPLOTTER
-            obj@Plotter();
+            if nargin < 1
+                noFigure = false;
+            end
+            if nargin < 2 
+                maxWindowSize = 100;
+            end                
+            obj@Plotter(noFigure);
             obj.maxWindowSize = maxWindowSize;
-            obj.plotHandle = plot(NaN);
-            xlim([0, obj.maxWindowSize])
+            if ~noFigure
+                obj.plotHandle = plot(NaN);
+                xlim([0, obj.maxWindowSize])
+            end
         end
     end
     
     %% Interface Methods
     methods
         function transfer(obj, data)
-            % set focus to the figure
-            figure(obj.F);
+            % set focus to the figure, if not empty
+            %   empty figure can be the case if plothandle in App uiaxes is
+            %   used instead
+            if ~isempty(obj.F)
+                figure(obj.F);
+            end
             % data is assumed to be n x m, where n is the number of samples
             % and m the number fo features
             if size(data, 2) == 1
@@ -125,6 +137,13 @@ classdef MovingWindowPlotter < Plotter
                 obj.holdOnCount = 0;
             end
             obj.holdOnCount = obj.holdOnCount + 1;
+        end
+    end
+    
+    %% setting methods
+    methods
+        function setPlotHandle(obj, plotHandle)
+            obj.plotHandle = plotHandle;             
         end
     end
 end

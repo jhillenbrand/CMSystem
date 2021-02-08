@@ -6,7 +6,7 @@ classdef AEAcquisitor < DataAcquisitor
     %AEDATAACQUISITOR
     
     properties
-        javaDux = [];
+        javaDux = JavaDUX.empty;
     end
     
     methods        
