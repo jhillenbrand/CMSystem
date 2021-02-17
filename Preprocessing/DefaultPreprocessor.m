@@ -19,7 +19,7 @@ classdef DefaultPreprocessor < Preprocessor
             % delete all previous transformations
             obj.transformations = [];
             if obj.applyMovingAverage
-                transformation = PreprocessingTransformation(@(x)SignalAnalysis.movingAverage(x, obj.averagingWindowSize), ['MovingAverageFilter [ws=' num2str(obj.averagingWindowSize) ']']);
+                transformation = PreprocessingTransformation(['MovingAverageFilter [ws=' num2str(obj.averagingWindowSize) ']'], @(x)SignalAnalysis.movingAverage(x, obj.averagingWindowSize));
                 obj.addTransformation(transformation);
             end            
         end

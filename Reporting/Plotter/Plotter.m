@@ -35,6 +35,21 @@ classdef Plotter < Modeler
         function newData = transform(obj, data)
             newData = data;
         end
+        
+        function newData = transfer(obj, data)
+            figure(obj.F);
+            if DataTransformer.is1D(data)
+                P.plot1DFeatures(data);
+            elseif DataTransformer.is2D(data)
+                P.plot2DFeatures(data);  
+            elseif DataTransformer.is3D(data)
+                P.plot3DFeatures(data);  
+            else
+                size(data)
+                error('dimensions of data are not supported for plotting');
+            end
+            newData = data;
+        end
     end
 end
 

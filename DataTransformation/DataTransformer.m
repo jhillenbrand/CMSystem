@@ -11,15 +11,29 @@ classdef DataTransformer < DataTransformerInterface
         observers = DataTransformer.empty();
         transformations = Transformation.empty();
         active = false;
+        dataPersistent = false;
+        dataBuffer = [];
+    end
+    
+    methods
+        function obj = DataTransformer(name, transformation)
+            if nargin > 1
+                obj.addTransformation(transformation);
+                obj.name = name;
+            end
+        end
     end
     
     methods
         %% - update
-        function update(obj, data)
+        function newData = update(obj, data)
             %UPDATE(obj, data)
             obj.active = true;
-            newData = obj.transform(data);
-            obj.transfer(newData);
+            transformedData = obj.transform(data);
+            if obj.dataPersistent
+                obj.dataBuffer = transformedData;
+            end
+            newData = obj.transfer(transformedData);
             obj.active = false;
         end
         
@@ -34,11 +48,19 @@ classdef DataTransformer < DataTransformerInterface
         end
         
         %% - transfer
-        function transfer(obj, data)
+        function newData = transfer(obj, data)
             %TRANSFER(obj, data)
+            %newData = cell(1, length(obj.observers));
+            newData = [];
             for o = 1 : length(obj.observers)
                 observer = obj.observers(o);
-                observer.update(data);
+                %newData{1, o} = observer.update(data);
+                newDataTemp = observer.update(data);
+                if ~isempty(newData) && ~DataTransformer.is1D(newData)
+                    newData = {newData, newDataTemp};
+                else
+                    newData = [newData, newDataTemp];
+                end
             end
         end
         
@@ -65,6 +87,39 @@ classdef DataTransformer < DataTransformerInterface
             %   collection
             obj.observers = [obj.observers; observer];
         end
-    end
+        
+        %% - setDataPersistent
+        function setDataPersistent(obj, value)
+            obj.dataPersistent = value;
+            if ~value
+                obj.dataBuffer = [];
+            end
+        end
+    end    
+    methods (Static, Access = protected)
+        function bool = is1D(data)
+            if sum(size(data) == 1) == 1 || isscalar(data)
+                bool = true;
+            else
+                bool = false;
+            end
+        end
+        
+        function bool = is2D(data)
+            if length(size(data)) == 2
+                bool = true;
+            else
+                bool = false;
+            end
+        end
+        
+        function bool = is3D(data)
+            if length(size(data)) == 3
+                bool = true;
+            else
+                bool = false;
+            end
+        end
+    end  
 end
 

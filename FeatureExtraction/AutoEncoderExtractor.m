@@ -23,7 +23,7 @@ classdef AutoencoderExtractor < FeatureExtractor & LearnableInterface
             obj.fRes = fRes;
             obj.sampleRate = sampleRate;
             funcHandle = @(x)obj.predictMSE(x);
-            transformation = Transformation(funcHandle, ['Autoencoder MSE ' class(Transformation.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']']);
+            transformation = Transformation(['Autoencoder MSE ' class(Transformation.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'], funcHandle);
             obj.addTransformation(transformation);
             
             % init autoencoder and peakfinder
@@ -38,19 +38,41 @@ classdef AutoencoderExtractor < FeatureExtractor & LearnableInterface
         function setAutoencoder(obj, autoencoder)
             obj.autoencoder = autoencoder;
         end
-                
+                                
+        %% - predictMSE
+        function newData = predictMSE(obj, data)
+            data_Pred = predict(obj.autoencoder, data');
+            newData = mean(SignalAnalysis.getMSE(data, data_Pred', 2));
+        end
+    end
+    
+    %% Interface Methods
+    methods       
+        %% - learn
+        function learn(obj, data)
+            %LEARN implements the LearnableInterface Method
+            obj.defaultLearn(data);
+        end
+        
+        %% - transform
+        function newData = transform(obj, data)
+            
+        end
+    end
+    
+    methods (Access = private)
         %% - defaultLearn
         function defaultLearn(obj, data)            
-            %[numOfHiddenNeurons, maxNumOfHiddenNeurons, minNumOfHiddenNeurons] = obj.autoencoder.estimateHiddenNeuronsWithFrequencyDomain(obj.peakFinder, data);
-            %obj.autoencoder.setHiddenWidth(numOfHiddenNeurons);            
-            obj.autoencoder.estimateHiddenNeuronsWithFrequencyDomain(obj.peakFinder, data);
+            obj.setDefaultPeakFinder();
+            obj.setDefaultAutoencoder();
+            obj.setDefaultLearnOptions();
             obj.autoencoder.train(data);
         end
             
         function setDefaultPeakFinder(obj)
             obj.peakFinder = PeakFinder(obj.sampleRate, obj.fRes, obj.fRes);
             obj.peakFinder.setFourierTransformOptions('fft');
-            obj.peakFinder.setThresholdOptions('std-all');
+            obj.peakFinder.setThresholdOptions('none');
         end
         
         function setDefaultAutoencoder(obj)
@@ -74,22 +96,7 @@ classdef AutoencoderExtractor < FeatureExtractor & LearnableInterface
                 'L2Regularization', 0.01, ...
                 'ValidationPatience', 10, ...
                 'Plots', 'training-progress');
-        end 
-                         
-        %% - predictMSE
-        function newData = predictMSE(obj, data)
-            data_Pred = predict(obj.autoencoder, data');
-            newData = mean(SignalAnalysis.getMSE(data, data_Pred', 2));
-        end
-    end
-    
-    %% Interface Methods
-    methods       
-        %% - learn
-        function learn(obj, data)
-            %LEARN implements the LearnableInterface Method
-            obj.defaultLearn(data);
-        end
+        end             
     end
 end
 

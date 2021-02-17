@@ -10,8 +10,8 @@ classdef PreprocessingTransformation < Transformation
     end
     
     methods
-        function obj = PreprocessingTransformation(funcHandle, name)
-            obj@Transformation(funcHandle, name);
+        function obj = PreprocessingTransformation(name, funcHandle)
+            obj@Transformation(name, funcHandle);
         end
     end
 end

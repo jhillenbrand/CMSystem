@@ -18,7 +18,7 @@ classdef FixedWindowSegmenter < Segmenter
             %   SignalAnalysis.separateDataIntoWindows
             obj.windowSize = windowSize;            
             funcHandle = @(x) SignalAnalysis.separateDataIntoWindows(x, windowSize);
-            trafo = SegmentationTransformation(funcHandle, ['FixedWindowSegmentation [ws=' num2str(windowSize) ']']);
+            trafo = SegmentationTransformation(['FixedWindowSegmentation [ws=' num2str(windowSize) ']'], funcHandle);
             obj.addTransformation(trafo);
         end        
     end

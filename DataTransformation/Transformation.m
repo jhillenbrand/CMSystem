@@ -12,7 +12,7 @@ classdef Transformation < TransformationInterface
     end
     
     methods
-        function obj = Transformation(funcHandle, name)
+        function obj = Transformation(name, funcHandle)
             %TRANSFORMATION(name, funcHandle)
             if nargin < 2
                 name = [class(Transformation.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'];

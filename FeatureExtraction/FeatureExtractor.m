@@ -17,9 +17,13 @@ classdef FeatureExtractor < DataTransformer
             for t = 1 : length(obj.transformations)
                 trafo = obj.transformations(t);
                 trafoData = trafo.apply(data);
-                newData = [newData, trafoData(:)];
+                if DataTransformer.is1D(trafoData)
+                    newData = [newData, trafoData(:)];
+                else
+                    newData = [newData, trafoData];
+                end
             end
         end
-    end
+    end      
 end
 

@@ -21,5 +21,5 @@ ex.addObserver(plotter);
 
 %%
 while (true)
-    rsDAQ.update();
+    newData = rsDAQ.update();
 end
