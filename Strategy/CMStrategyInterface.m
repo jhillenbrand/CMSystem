@@ -6,7 +6,7 @@ classdef CMStrategyInterface < handle
     %CMSYSTEMINTERFACE
     
     methods (Abstract)
-        execute(obj, cmSystem);
+        out = execute(obj, cmSystem);
     end
 end
 

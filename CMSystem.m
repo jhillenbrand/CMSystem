@@ -10,10 +10,15 @@ classdef CMSystem < CMSystemInterface
         L = JLog(); 
         name = '';
         transformers = [];
-        strategies = [];
+        strategies = {};
         activeStrategy = [];
         reporters = [];        
         interventors = [];
+    end
+    
+    %% setting properties
+    properties
+        saveToFilePath = 'cmsystem_save.mat';
     end
     
     %% Constructor Method
@@ -26,12 +31,11 @@ classdef CMSystem < CMSystemInterface
     end
     
     %% Interface Methods
-    methods
-        function start(obj)
-            
-        end
+    methods (Abstract)
+        start(obj);
     end
     
+    %%
     methods
         function addTransformer(obj, transformer)
             if class(Transformer()) == class(transformer)                
@@ -53,22 +57,6 @@ classdef CMSystem < CMSystemInterface
         function executeActiveStrategy(obj)
             obj.activeStrategy.execute(obj);
         end
-        
-        function addReporter(obj, reporter)
-            if class(Reporter()) == class(reporter)
-                obj.reporters = [obj.reporters; reporter];
-            else
-                obj.L.log('ERROR', ['reporter must be of type ' class(Reporter())]);
-            end
-        end
-        
-        function addInterventor(obj, interventor)
-            if class(Interventor()) == class(interventor)
-                obj.interventor = [obj.interventor; interventor];
-            else
-                obj.L.log('ERROR', ['interventor must be of type ' class(Interventor())]);
-            end
-        end
     end
     
     %% Public Helper Methods
@@ -79,12 +67,28 @@ classdef CMSystem < CMSystemInterface
             %   object within obj.strategies given by name strategyName
             foundStrategy = [];
             for s = 1 : length(obj.strategies)
-                strategy = obj.strategies(s);
+                strategy = obj.strategies{s};
                 if strcmp(strategy.name, strategyName)
                     foundStrategy = strategy;
                     return;
                 end
             end
+        end
+        function addStrategy(obj, strategy)
+            if isempty(obj.strategies)
+                obj.strategies = {strategy};
+            else
+                obj.strategies = [obj.strategies; {strategy}];
+            end
+        end
+        
+        function saveToFile(obj)
+            save(obj.saveToFilePath, 'obj');
+        end
+        
+        function buildFromFile(obj)
+            mat = load(obj.saveToFilePath);
+            obj = mat.obj;
         end
     end
 end

@@ -10,8 +10,14 @@ classdef CMStrategy < CMStrategyInterface
         name = 'CMStrategy1';
     end
     
+    methods
+        function obj = CMStrategy(name)
+            obj.name = name;
+        end
+    end
+    
     methods (Abstract)
-        execute(obj, cmSystem);
+        out = execute(obj, cmSystem);
     end
 end
 

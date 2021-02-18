@@ -1,12 +1,14 @@
-classdef Reporter < ReporterInterface
+classdef Reporter < DataTransformer & ReporterInterface
     %REPORTER 
     
     properties
-        name = 'Reporter1';
+        
     end
     
-    methods (Abstract)
-        report();
+    methods
+        function report(obj)
+            disp('Reported');
+        end
     end
 end
 

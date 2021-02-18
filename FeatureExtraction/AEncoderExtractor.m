@@ -15,10 +15,18 @@ classdef AEncoderExtractor < AutoencoderExtractor
         end
     end
     
+    %% Interface Methods
     methods
         %% - learn
         function learn(obj, data)
             obj.defaultLearn(data);
+        end
+    end
+    
+    %% - getPeaks
+    methods
+        function peaks = getPeaks(obj, data)
+            peaks = obj.peakFinder.applyPeakFinder(data);
         end
     end
     

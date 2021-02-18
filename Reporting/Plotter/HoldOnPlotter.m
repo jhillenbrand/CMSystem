@@ -18,7 +18,7 @@ classdef HoldOnPlotter < Plotter
     
     %% Interface Methods
     methods
-        function newData = transfer(obj, data)
+        function newData = transform(obj, data)
             % set focus to the figure
             figure(obj.F);
             % data is assumed to be n x m, where n is the number of samples

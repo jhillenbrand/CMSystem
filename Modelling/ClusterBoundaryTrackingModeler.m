@@ -38,5 +38,12 @@ classdef ClusterBoundaryTrackingModeler < Modeler
             newData = obj.clusterBoundaryTrackingObj;
         end
     end
+    
+    %% Public Helper Methods
+    methods
+        function clusterTransitions = getLatestTransitions(obj)
+            clusterTransitions = obj.clusterBoundaryTrackingObj.clusterTransitions;
+        end
+    end
 end
 

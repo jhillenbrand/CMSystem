@@ -35,7 +35,7 @@ ex2.addObserver(plotter2);
 
 %%
 while (true)
-    newData = rsDAQ.update([]);
+    rsDAQ.update([]);
 end
 
 function p = getAmplitudeBins(data, f_sr)

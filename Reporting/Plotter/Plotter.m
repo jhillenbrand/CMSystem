@@ -1,9 +1,21 @@
-classdef Plotter < Modeler
+classdef Plotter < Reporter
     %PLOTTER 
     
     properties
         F = []; % figure variable
         numOfDataPoints = 0;
+    end
+    
+    %% static variable for figure index
+    methods (Access = protected)
+        function figIndex = incrementFigureIndex(obj)
+            persistent figureIndex
+            if isempty(figureIndex)
+                figureIndex = 0;
+            end
+            figureIndex = figureIndex + 1;
+            figIndex = figureIndex;
+        end
     end
     
     methods
@@ -14,7 +26,7 @@ classdef Plotter < Modeler
                 noFigure = false;
             end
             if ~noFigure                
-                obj.F = figure();
+                obj.F = obj.incrementFigureIndex();
             end
         end
         
@@ -33,10 +45,6 @@ classdef Plotter < Modeler
     %% Interface Methods
     methods
         function newData = transform(obj, data)
-            newData = data;
-        end
-        
-        function newData = transfer(obj, data)
             figure(obj.F);
             if DataTransformer.is1D(data)
                 P.plot1DFeatures(data);

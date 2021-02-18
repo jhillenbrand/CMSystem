@@ -17,13 +17,14 @@ classdef ClusterStatePlotter < Plotter
     
     %% Interface Methods
     methods
-        function transfer(obj, data)
+        function newData = transform(obj, data)
             if isa(data, 'ClusterBoundaryTracking')
                 figure(obj.F);
                 data.plotClusterState()
             else
                 error(['data is not of type ClusterBoundaryTracking'])
             end
+            newData = data;
         end
     end
     

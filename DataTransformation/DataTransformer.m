@@ -10,7 +10,8 @@ classdef DataTransformer < DataTransformerInterface
         name = [class(DataTransformer.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'];
         observers = DataTransformer.empty();
         transformations = Transformation.empty();
-        active = false;
+        isActive = false;
+        isEnabled = true;
         dataPersistent = false;
         dataBuffer = [];
     end
@@ -24,17 +25,21 @@ classdef DataTransformer < DataTransformerInterface
         end
     end
     
+    %% interface methods
     methods
         %% - update
-        function newData = update(obj, data)
+        function update(obj, data)
             %UPDATE(obj, data)
-            obj.active = true;
-            transformedData = obj.transform(data);
-            if obj.dataPersistent
-                obj.dataBuffer = transformedData;
+            obj.isActive = true;
+            transformedData = data;
+            if obj.isEnabled
+                transformedData = obj.transform(transformedData);
+                if obj.dataPersistent
+                    obj.dataBuffer = transformedData;
+                end
             end
-            newData = obj.transfer(transformedData);
-            obj.active = false;
+            obj.transfer(transformedData);
+            obj.isActive = false;
         end
         
         %% - transform
@@ -42,28 +47,24 @@ classdef DataTransformer < DataTransformerInterface
             %TRANSFORM(obj, data)
             newData = [];
             for t = 1 : length(obj.transformations)
+                %plot(data)
                 trafo = obj.transformations(t);
                 newData = [newData, trafo.apply(data)];
             end
         end
         
         %% - transfer
-        function newData = transfer(obj, data)
+        function transfer(obj, data)
             %TRANSFER(obj, data)
-            %newData = cell(1, length(obj.observers));
-            newData = [];
             for o = 1 : length(obj.observers)
                 observer = obj.observers(o);
-                %newData{1, o} = observer.update(data);
-                newDataTemp = observer.update(data);
-                if ~isempty(newData) && ~DataTransformer.is1D(newData)
-                    newData = {newData, newDataTemp};
-                else
-                    newData = [newData, newDataTemp];
-                end
+                observer.update(data);
             end
         end
-        
+    end
+    
+    %% GETTER AND SETTER
+    methods
         %% - getNumberOfObservers
         function count = getNumberOfObservers(obj)
             %GETNUMBEROFOBSERVERS(obj)
@@ -95,7 +96,17 @@ classdef DataTransformer < DataTransformerInterface
                 obj.dataBuffer = [];
             end
         end
-    end    
+        
+        %% - enable
+        function enable(obj)
+            obj.isEnabled = true;
+        end
+        
+        function disable(obj)
+            obj.isEnabled = false;
+        end
+    end 
+    %% UTILITY Methods (Static)
     methods (Static, Access = protected)
         function bool = is1D(data)
             if sum(size(data) == 1) == 1 || isscalar(data)

@@ -20,6 +20,12 @@ fwSeg.addObserver(ex);
 ex.addObserver(plotter);
 
 %%
+w = 0;
 while (true)
-    newData = rsDAQ.update();
+    w = w + 1;
+    rsDAQ.update([]);
+    
+    if w > 100
+        prePro.disable();
+    end
 end

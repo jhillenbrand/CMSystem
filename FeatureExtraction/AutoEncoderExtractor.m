@@ -41,6 +41,13 @@ classdef AutoencoderExtractor < FeatureExtractor & LearnableInterface
                                 
         %% - predictMSE
         function newData = predictMSE(obj, data)
+            %PREDICTMSE predicts the reconstruction for data
+            
+            % data is a f x w matrix, where f is the number of features
+            %   (here each raw sample is considered a feature) and w is the
+            %   number of windows
+            %   or
+            %   data is a f x 1 vector
             data_Pred = predict(obj.autoencoder, data');
             newData = mean(SignalAnalysis.getMSE(data, data_Pred', 2));
         end
@@ -56,7 +63,7 @@ classdef AutoencoderExtractor < FeatureExtractor & LearnableInterface
         
         %% - transform
         function newData = transform(obj, data)
-            
+            newData = obj.predictMSE(data);
         end
     end
     

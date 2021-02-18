@@ -29,7 +29,7 @@ classdef HoldOnSubPlotter < Plotter
     
     %% Interface Methods
     methods
-        function transfer(obj, data)
+        function newData = transform(obj, data)
             % set focus to the figure
             figure(obj.F);
             % check if maxHoldOn is reached and then clear plots
@@ -60,6 +60,7 @@ classdef HoldOnSubPlotter < Plotter
             else
                 error(['undefined data dimensions for ' class(HoldOnPlotter)])
             end
+            newData = data;
         end
     end
     

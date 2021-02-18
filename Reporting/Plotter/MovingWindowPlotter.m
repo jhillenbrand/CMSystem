@@ -26,7 +26,7 @@ classdef MovingWindowPlotter < Plotter
     
     %% Interface Methods
     methods
-        function transfer(obj, data)
+        function newData = transform(obj, data)
             % set focus to the figure, if not empty
             %   empty figure can be the case if plothandle in App uiaxes is
             %   used instead
@@ -47,6 +47,7 @@ classdef MovingWindowPlotter < Plotter
             else
                 error(['undefined data dimensions for ' class(HoldOnPlotter)])
             end
+            newData = data;
         end
     end
     

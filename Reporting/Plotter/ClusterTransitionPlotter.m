@@ -17,13 +17,14 @@ classdef ClusterTransitionPlotter < Plotter
     
     %% Interface Methods
     methods
-        function transfer(obj, data)
+        function newData = transform(obj, data)
             if isa(data, class(ClusterBoundaryTracking.empty))
                 figure(obj.F);
                 data.plotTransitions();
             else
                 error(['data is not of type ' class(ClusterBoundaryTracking.empty)])
             end
+            newData = data;
         end
     end
 end
