@@ -18,11 +18,15 @@ classdef ClusterStatePlotter < Plotter
     %% Interface Methods
     methods
         function newData = transform(obj, data)
-            if isa(data, 'ClusterBoundaryTracking')
-                figure(obj.F);
-                data.plotClusterState()
+            if ~isempty(data)
+                if isa(data, 'ClusterBoundaryTracking')
+                    figure(obj.F);
+                    data.plotClusterState()
+                else
+                    error(['data is not of type ClusterBoundaryTracking'])
+                end
             else
-                error(['data is not of type ClusterBoundaryTracking'])
+                warning('data was empty')
             end
             newData = data;
         end

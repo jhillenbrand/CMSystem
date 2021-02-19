@@ -27,18 +27,17 @@ classdef Plotter < Reporter
             end
             if ~noFigure                
                 obj.F = obj.incrementFigureIndex();
+                figure(obj.F);
             end
         end
         
-        function setFigure(obj, fig)
+        function setFigure(obj, index)
             if nargin < 1
                 error('not enough input arguments')
             end
-            if class(fig)~= class('Figure')
-                error('input FIG must be of type Figure');
-            end
-            close(obj.F);
-            obj.F = fig;
+            obj.F = index;
+            close(figure(obj.F));
+            figure(obj.F);
         end
     end
     

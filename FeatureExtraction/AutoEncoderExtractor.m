@@ -48,8 +48,8 @@ classdef AutoencoderExtractor < FeatureExtractor & LearnableInterface
             %   number of windows
             %   or
             %   data is a f x 1 vector
-            data_Pred = predict(obj.autoencoder, data');
-            newData = mean(SignalAnalysis.getMSE(data, data_Pred', 2));
+            data_Pred = obj.autoencoder.predict(data);
+            newData = mean(SignalAnalysis.getMSE(data, data_Pred, 2));
         end
     end
     
@@ -83,7 +83,8 @@ classdef AutoencoderExtractor < FeatureExtractor & LearnableInterface
         end
         
         function setDefaultAutoencoder(obj)
-            obj.autoencoder = MyDeepAutoencoder(6, 1);
+            %obj.autoencoder = MyDeepAutoencoder(6, 1);
+            obj.autoencoder = MyShallowAutoencoder(6);
             obj.setDefaultLearnOptions();
         end
         

@@ -25,7 +25,7 @@ classdef AEncoderMemoryLearningStrategy < CMStrategy
             end
             
             % disable unneeded DataTransformers
-            cmSystem.clusterBoundaryTracker.disable();
+            cmSystem.clusteringModel.disable();
             cmSystem.aeEncoderExtractor.disable();
             cmSystem.rmsExtractor.disable();
             cmSystem.merger.disable();
@@ -77,7 +77,7 @@ classdef AEncoderMemoryLearningStrategy < CMStrategy
             disp(['trained new autoencoder (' num2str(length(cmSystem.aeEncoderExtractor.lastAutoencoders) + 1) ')']);
             
             % enable DataTransformers back
-            cmSystem.clusterBoundaryTracker.enable();
+            cmSystem.clusteringModel.enable();
             cmSystem.aeEncoderExtractor.enable();
             cmSystem.rmsExtractor.enable();
             cmSystem.merger.enable();

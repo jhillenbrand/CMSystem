@@ -20,9 +20,9 @@ classdef ClusterBoundaryTrackingModeler < Modeler
             cbt.hyperparameters.KeepDataPoints = true;
             cbt.hyperparameters.DisplayClusterState = false;
             cbt.hyperparameters.ClusterEachIteration = false;
-            
-            %cbt.setClusterMethod();
-            
+            cbt.hyperparameters.MinSizeDataPoints = 25;
+            cbt.hyperparameters.NormalizeDataPoints = true; 
+                        
             obj.clusterBoundaryTrackingObj = cbt;
         end
     end

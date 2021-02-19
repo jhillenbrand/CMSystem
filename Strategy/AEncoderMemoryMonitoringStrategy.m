@@ -15,9 +15,7 @@ classdef AEncoderMemoryMonitoringStrategy < CMStrategy
     methods 
         function out = execute(obj, cmSystem)
             while true
-                cmSystem.aeDataAcquisitor.update([]);
-                clusterTransitions = cmSystem.clusterBoundaryTracker.getLatestTransitions();
-                
+                cmSystem.aeDataAcquisitor.update([]);                
             end
         end
     end

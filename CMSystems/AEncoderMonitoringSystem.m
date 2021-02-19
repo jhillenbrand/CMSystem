@@ -8,10 +8,10 @@ classdef AEncoderMonitoringSystem < CMSystem
         aeEncoderExtractor = AEncoderExtractor.empty;
         rmsExtractor = FeatureExtractor.empty;
         merger = MergeTransformer.empty;
-        clusterBoundaryTracker = ClusterBoundaryTrackingModeler.empty;
+        clusteringModel = ClusterBoundaryTrackingModeler.empty;
         rawAEPlotter = MovingWindowPlotter.empty;
-        clusterStatePlotter = ClusterStatePlotter.empty;
-        clusterTransitionPlotter = ClusterTransitionPlotter.empty;
+        clusterPlotter = SimpleClusterPlotter.empty;
+        %clusterTransitionPlotter = ClusterTransitionPlotter.empty;
     end
         
     %% config settings
@@ -58,6 +58,7 @@ classdef AEncoderMonitoringSystem < CMSystem
             extractor.name = 'RMS_Extractor';
             extractor.transformToPeakFactor = false;
             extractor.transformToMeanFrequency = false;
+            extractor.initFeatureTransformations();
             obj.rmsExtractor = extractor;
             
             obj.preprocessor.addObserver(obj.rmsExtractor);
@@ -69,18 +70,19 @@ classdef AEncoderMonitoringSystem < CMSystem
             
             
             % Step 5 - Modeling
-            obj.clusterBoundaryTracker = ClusterBoundaryTrackingModeler();
+            %obj.clusteringModel = ClusterBoundaryTrackingModeler();
+            obj.clusteringModel = SimpleClusterBoundaryModeler();
             
-            obj.merger.addObserver(obj.clusterBoundaryTracker);
+            obj.merger.addObserver(obj.clusteringModel);
             
             % Step 6 - Reporting
             obj.rawAEPlotter = MovingWindowPlotter(false, 5 * obj.sampleRate);
-            obj.clusterStatePlotter = ClusterStatePlotter();
-            obj.clusterTransitionPlotter = ClusterTransitionPlotter();
+            obj.clusterPlotter = SimpleClusterPlotter();
+            %obj.clusterTransitionPlotter = ClusterTransitionPlotter();
             
             obj.preprocessor.addObserver(obj.rawAEPlotter);
-            obj.clusterBoundaryTracker.addObserver(obj.clusterStatePlotter);
-            obj.clusterBoundaryTracker.addObserver(obj.clusterTransitionPlotter);
+            obj.clusteringModel.addObserver(obj.clusterPlotter);
+            %obj.clusteringModel.addObserver(obj.clusterTransitionPlotter);
         end        
     end
     
