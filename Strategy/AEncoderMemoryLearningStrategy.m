@@ -4,10 +4,11 @@ classdef AEncoderMemoryLearningStrategy < CMStrategy
     %   Autoencoder
     
     properties
-        minPeakLearnIterations = 25;
-        maxPeakLearnIterations = 100;
+        minPeakLearnIterations = 5;
+        maxPeakLearnIterations = 25;
         meanPeakConvergeThreshold = 0.1;
         consecutiveNoChanges = 5;
+        numOfBatches = 10;
     end
     
     methods
@@ -31,13 +32,13 @@ classdef AEncoderMemoryLearningStrategy < CMStrategy
             cmSystem.merger.disable();
             
             % make preprocessor data before extractor persistent
-            cmSystem.preprocessor.setDataPersistent(true);
+            cmSystem.lowPassProcessor.setDataPersistent(true);
             
             % incremental peakfinding
             meanPeaks = 0;
             for i = 1 : obj.minPeakLearnIterations
                 data = obj.getPreprocessorData(cmSystem);               
-                peaks = cmSystem.aeEncoderExtractor.getPeaks(data);
+                peaks = cmSystem.aeEncoderExtractor.getPeaks(data(:));
                 if meanPeaks == 0
                     meanPeaks = peaks.mean;
                 else
@@ -66,7 +67,7 @@ classdef AEncoderMemoryLearningStrategy < CMStrategy
             disp(['found meanPeak = ' num2str(meanPeaks)])
             
             % fourier idea for hidden neurons
-            cmSystem.aeEncoderExtractor.autoencoder.setHiddenWidth(ceil(3 * meanPeaks + 1));
+            cmSystem.aeEncoderExtractor.autoencoder.setHiddenWidth(ceil(3 * meanPeaks) + 1);
             % train MyAutoencoder for meanPeak            
             cmSystem.aeEncoderExtractor.autoencoder.train(data);
             while ~cmSystem.aeEncoderExtractor.isIterativeTrainingComplete()
@@ -81,7 +82,7 @@ classdef AEncoderMemoryLearningStrategy < CMStrategy
             cmSystem.aeEncoderExtractor.enable();
             cmSystem.rmsExtractor.enable();
             cmSystem.merger.enable();
-            cmSystem.preprocessor.setDataPersistent(false);
+            cmSystem.lowPassProcessor.setDataPersistent(false);
             out = true;
         end
     end
@@ -89,8 +90,13 @@ classdef AEncoderMemoryLearningStrategy < CMStrategy
     %% Private Methods
     methods (Access = private)
         function data = getPreprocessorData(obj, cmSystem)
-            cmSystem.aeDataAcquisitor.update([]);
-            data = cmSystem.preprocessor.dataBuffer;
+            b = 1;
+            data = [];
+            while b <= obj.numOfBatches
+                cmSystem.aeDataAcquisitor.update([]);
+                data = [data, cmSystem.lowPassProcessor.dataBuffer];
+                b = b + 1;
+            end
             if isempty(data)
                 error('could not retrieve data from Preprocessor, make sure it is set to dataPersistent')
             end     

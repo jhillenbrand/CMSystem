@@ -15,7 +15,9 @@ classdef AEncoderMemoryMonitoringStrategy < CMStrategy
     methods 
         function out = execute(obj, cmSystem)
             while true
-                cmSystem.aeDataAcquisitor.update([]);                
+                cmSystem.aeDataAcquisitor.update([]);
+                memory
+                %disp(['CMSystem required memory [bytes]: ' num2str(w.bytes)])
             end
         end
     end

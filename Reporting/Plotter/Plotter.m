@@ -58,5 +58,12 @@ classdef Plotter < Reporter
             newData = data;
         end
     end
+    
+    methods 
+        function resetFigureIndex(obj)
+            persistent figureIndex
+            figureIndex = 0;
+        end
+    end
 end
 

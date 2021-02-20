@@ -5,10 +5,11 @@ classdef AEncoderMonitoringSystem < CMSystem
     properties
         aeDataAcquisitor = DataAcquisitor.empty;
         preprocessor = Preprocessor.empty;
+        lowPassProcessor = Preprocessor.empty;
         aeEncoderExtractor = AEncoderExtractor.empty;
         rmsExtractor = FeatureExtractor.empty;
         merger = MergeTransformer.empty;
-        clusteringModel = ClusterBoundaryTrackingModeler.empty;
+        clusteringModel = SimpleClusterBoundaryModeler.empty;
         rawAEPlotter = MovingWindowPlotter.empty;
         clusterPlotter = SimpleClusterPlotter.empty;
         %clusterTransitionPlotter = ClusterTransitionPlotter.empty;
@@ -16,10 +17,13 @@ classdef AEncoderMonitoringSystem < CMSystem
         
     %% config settings
     properties
-        AE_MAT_FOLDER = 'U:\18_071_DFG_AE_KGT\4_Arbeitsinhalte\4_1_Measurements\5-Achser-KGT-Measurements\20210118_mess_ae_kgt_cam\Verschleissfahrt3\';
+        AE_MAT_FOLDER = 'U:\18_071_DFG_AE_KGT\4_Arbeitsinhalte\4_1_Measurements\5-Achser-KGT-Measurements\20201026_mess_ae_only\20201202_baseline3\AE\';
+                        %'U:\18_071_DFG_AE_KGT\4_Arbeitsinhalte\4_1_Measurements\5-Achser-KGT-Measurements\20201026_mess_ae_only\20201214_particle_OL\AE\';
         sampleRate = 2e6;
+        windowSize = 100e3;
         f_res = 100;
         bitPrecision = 12;
+        lowPassFrequency = 250e3;
     end
     
     methods
@@ -34,25 +38,31 @@ classdef AEncoderMonitoringSystem < CMSystem
         
         function initTransformers(obj)
             % Step 1 - Data Acquisition Setup
-            aeFiles = DataParser.getFilePaths(obj.AE_MAT_FOLDER, 'mat', 'ORFL', true);
+            aeFiles = DataParser.getFilePaths(obj.AE_MAT_FOLDER, 'mat', 'micro80-301', true);
             dp = DataParser('FileType', 'mat');
-            n = obj.sampleRate / 4;
-            obj.aeDataAcquisitor = SimStreamAcquisitor(dp, aeFiles, n, n);
+            obj.aeDataAcquisitor = SimStreamAcquisitor(dp, aeFiles, obj.windowSize, obj.windowSize);
             
             % Step 2 - Preprocessing Setup
             obj.preprocessor = Preprocessor();
             funcHandle = @(x) SignalAnalysis.correctBitHickup(x, obj.bitPrecision, true, false);
             preprocTrafo = PreprocessingTransformation('BitHickUpTrafo', funcHandle);
             obj.preprocessor.addTransformation(preprocTrafo);
-
+           
             obj.aeDataAcquisitor.addObserver(obj.preprocessor);
+            
+            %add low pass filter
+            obj.lowPassProcessor = Preprocessor();
+            funcHandle2 = @(x) SignalAnalysis.lowpass2(x, obj.sampleRate, obj.lowPassFrequency);
+            preprocTrafo2 = PreprocessingTransformation('LowPassFilter', funcHandle2);
+            obj.lowPassProcessor.addTransformation(preprocTrafo2);
+            obj.preprocessor.addObserver(obj.lowPassProcessor);
             
             % Step 3 - Segmenting Setup
             
             % Step 4 - Feature Extraction
             obj.aeEncoderExtractor = AEncoderMemoryExtractor(obj.sampleRate, obj.f_res);
             
-            obj.preprocessor.addObserver(obj.aeEncoderExtractor);
+            obj.lowPassProcessor.addObserver(obj.aeEncoderExtractor);
             
             extractor = DefaultFeatureExtractor(obj.sampleRate);
             extractor.name = 'RMS_Extractor';
@@ -61,7 +71,7 @@ classdef AEncoderMonitoringSystem < CMSystem
             extractor.initFeatureTransformations();
             obj.rmsExtractor = extractor;
             
-            obj.preprocessor.addObserver(obj.rmsExtractor);
+            obj.lowPassProcessor.addObserver(obj.rmsExtractor);
             
             obj.merger = MergeTransformer('Merger', 2);
             
@@ -80,7 +90,7 @@ classdef AEncoderMonitoringSystem < CMSystem
             obj.clusterPlotter = SimpleClusterPlotter();
             %obj.clusterTransitionPlotter = ClusterTransitionPlotter();
             
-            obj.preprocessor.addObserver(obj.rawAEPlotter);
+            obj.lowPassProcessor.addObserver(obj.rawAEPlotter);
             obj.clusteringModel.addObserver(obj.clusterPlotter);
             %obj.clusteringModel.addObserver(obj.clusterTransitionPlotter);
         end        

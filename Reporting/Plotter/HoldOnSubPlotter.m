@@ -18,6 +18,7 @@ classdef HoldOnSubPlotter < Plotter
             obj.numOfSubplots = numOfSubplots;
             
             % setup plots for the first time with grid
+            figure(obj.F);
             for p = 1 : obj.numOfSubplots
                 subplot(obj.numOfSubplots, 1, p);
                 grid on
@@ -36,7 +37,7 @@ classdef HoldOnSubPlotter < Plotter
             if obj.holdOnCount > obj.maxHoldOn 
                 for p = 1 : obj.numOfSubplots
                     subplot(obj.numOfSubplots, 1, p);
-                        plot(0,0)
+                        plot(NaN,NaN)
                 end
             end
             

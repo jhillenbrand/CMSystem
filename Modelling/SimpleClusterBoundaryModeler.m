@@ -37,6 +37,7 @@ classdef SimpleClusterBoundaryModeler < Modeler
             else
                 newData = obj.boundaryClusterer.clusterStates(end);
                 newData.dataPoints = obj.boundaryClusterer.dataPoints;
+                newData.clusterIndices = obj.boundaryClusterer.clusterIndices;
             end
         end
     end
