@@ -19,7 +19,9 @@ classdef DataTransformer < DataTransformerInterface
     methods
         function obj = DataTransformer(name, transformation)
             if nargin > 1
-                obj.addTransformation(transformation);
+                if ~isemtpy(transformation)
+                    obj.addTransformation(transformation);
+                end
                 obj.name = name;
             end
         end

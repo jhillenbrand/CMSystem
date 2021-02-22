@@ -5,7 +5,6 @@ classdef AEncoderMonitoringSystem < CMSystem
     properties
         aeDataAcquisitor = DataAcquisitor.empty;
         preprocessor = Preprocessor.empty;
-        lowPassProcessor = Preprocessor.empty;
         aeEncoderExtractor = AEncoderExtractor.empty;
         rmsExtractor = FeatureExtractor.empty;
         merger = MergeTransformer.empty;
@@ -24,6 +23,7 @@ classdef AEncoderMonitoringSystem < CMSystem
         f_res = 100;
         bitPrecision = 12;
         lowPassFrequency = 250e3;
+        downsampleFactor = 4;
     end
     
     methods
@@ -43,20 +43,13 @@ classdef AEncoderMonitoringSystem < CMSystem
             obj.aeDataAcquisitor = SimStreamAcquisitor(dp, aeFiles, obj.windowSize, obj.windowSize);
             
             % Step 2 - Preprocessing Setup
-            obj.preprocessor = Preprocessor();
+            obj.preprocessor = AEPreprocessor('AE_PREPROCESSOR', obj.sampleRate, obj.lowPassFrequency, obj.downsampleFactor, obj.bitPrecision);
             funcHandle = @(x) SignalAnalysis.correctBitHickup(x, obj.bitPrecision, true, false);
             preprocTrafo = PreprocessingTransformation('BitHickUpTrafo', funcHandle);
             obj.preprocessor.addTransformation(preprocTrafo);
            
             obj.aeDataAcquisitor.addObserver(obj.preprocessor);
-            
-            %add low pass filter
-            obj.lowPassProcessor = Preprocessor();
-            funcHandle2 = @(x) SignalAnalysis.lowpass2(x, obj.sampleRate, obj.lowPassFrequency);
-            preprocTrafo2 = PreprocessingTransformation('LowPassFilter', funcHandle2);
-            obj.lowPassProcessor.addTransformation(preprocTrafo2);
-            obj.preprocessor.addObserver(obj.lowPassProcessor);
-            
+                        
             % Step 3 - Segmenting Setup
             
             % Step 4 - Feature Extraction
