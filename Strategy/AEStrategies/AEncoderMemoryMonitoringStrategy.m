@@ -18,6 +18,8 @@ classdef AEncoderMemoryMonitoringStrategy < CMStrategy
                 cmSystem.aeDataAcquisitor.update([]);
                 memory
                 %disp(['CMSystem required memory [bytes]: ' num2str(w.bytes)])
+                
+                
             end
         end
     end

@@ -74,12 +74,13 @@ classdef CMSystem < CMSystemInterface
                 end
             end
         end
+        
         function addStrategy(obj, strategy)
             if isempty(obj.strategies)
                 obj.strategies = {strategy};
             else
                 obj.strategies = [obj.strategies; {strategy}];
-            end
+            end  
         end
         
         function saveToFile(obj)
