@@ -8,8 +8,9 @@ classdef DefaultPreprocessor < Preprocessor
     
     methods
         function obj = DefaultPreprocessor()
+            obj@Preprocessor(['DefaultPreprocessor [' char(java.util.UUID.randomUUID().toString()) ']'], []);
             %DEFAULTPREPROCESSOR
-            obj.name = ['DefaultPreprocessor [' char(java.util.UUID.randomUUID().toString()) ']'];
+            %obj.name = ['DefaultPreprocessor [' char(java.util.UUID.randomUUID().toString()) ']'];
             obj.initFilterTransformations();
         end
         
