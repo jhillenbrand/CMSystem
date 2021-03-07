@@ -24,7 +24,7 @@ classdef AEPreprocessor < Preprocessor
             if nargin > 4
                 obj.bitPrecision = bitPrecision;
             end
-            funcHandle = @(x) AEPreprocessor.aePreProcFunc(x, obj.sampleRate, obj.lowPassFrequency, obj.downsampleFactor, obj.bitPrecision);
+            funcHandle = @(x) AEPreprocessor.aePreprocFunc(x, obj.sampleRate, obj.lowPassFrequency, obj.downsampleFactor, obj.bitPrecision);
             trafo = Transformation('AE_PREPROCESS', funcHandle);
             obj.addTransformation(trafo);
         end
@@ -35,8 +35,12 @@ classdef AEPreprocessor < Preprocessor
             %AEPREPROC(data, sampleRate, lowPassFrequency, downsampleFactor, bitPrecision)
             % Preprocessing Setup
             tempData = SignalAnalysis.correctBitHickup(data, bitPrecision, true, false);
-            tempData = SignalAnalysis.lowpass2(tempData, sampleRate, lowPassFrequency);
-            newData = downsample(tempData, downsampleFactor);
+            if lowPassFrequency > 0
+                tempData = SignalAnalysis.lowpass2(tempData, sampleRate, lowPassFrequency);
+            end
+            if downsampleFactor > 1
+                newData = downsample(tempData, downsampleFactor);
+            end
         end
     end
 end

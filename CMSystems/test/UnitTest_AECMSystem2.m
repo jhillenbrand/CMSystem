@@ -5,6 +5,7 @@ clc
 
 %%
 aeSystem = AEncoderMonitoringSystem();
+aeSystem.initTransformers();
 aeSystem.saveToFilePath = 'cmsystem_blank_save.mat';
 aeSystem.saveToFile();
 

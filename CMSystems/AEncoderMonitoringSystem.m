@@ -18,6 +18,8 @@ classdef AEncoderMonitoringSystem < CMSystem
     properties
         AE_MAT_FOLDER = 'U:\18_071_DFG_AE_KGT\4_Arbeitsinhalte\4_1_Measurements\5-Achser-KGT-Measurements\20201026_mess_ae_only\20201202_baseline3\AE\';
                         %'U:\18_071_DFG_AE_KGT\4_Arbeitsinhalte\4_1_Measurements\5-Achser-KGT-Measurements\20201026_mess_ae_only\20201214_particle_OL\AE\';
+        AE_FILE_NAME_ID = [];
+        AE_FILE_TYPE = 'mat';
         sampleRate = 2e6;
         windowSize = 100e3;
         f_res = 100;
@@ -31,23 +33,18 @@ classdef AEncoderMonitoringSystem < CMSystem
             %AENCODERMONITORINGSYSTEM
             obj.name = 'AEncoderMonitoringSystem';
             obj.addStrategy(AEncoderMemoryLearningStrategy('LearningStrategy'));
-            obj.addStrategy(AEncoderMemoryMonitoringStrategy('MonitoringStrategy'));
-            
-            obj.initTransformers();
+            obj.addStrategy(AEncoderMemoryMonitoringStrategy('MonitoringStrategy'));            
         end
         
         function initTransformers(obj)
             % Step 1 - Data Acquisition Setup
-            aeFiles = DataParser.getFilePaths(obj.AE_MAT_FOLDER, 'mat', 'micro80-301', true);
-            dp = DataParser('FileType', 'mat');
+            aeFiles = DataParser.getFilePaths(obj.AE_MAT_FOLDER, obj.AE_FILE_TYPE, obj.AE_FILE_NAME_ID, true);
+            dp = DataParser('FileType', obj.AE_FILE_TYPE);
             obj.aeDataAcquisitor = SimStreamAcquisitor(dp, aeFiles, obj.windowSize, obj.windowSize);
             
             % Step 2 - Preprocessing Setup
             obj.preprocessor = AEPreprocessor('AE_PREPROCESSOR', obj.sampleRate, obj.lowPassFrequency, obj.downsampleFactor, obj.bitPrecision);
-            funcHandle = @(x) SignalAnalysis.correctBitHickup(x, obj.bitPrecision, true, false);
-            preprocTrafo = PreprocessingTransformation('BitHickUpTrafo', funcHandle);
-            obj.preprocessor.addTransformation(preprocTrafo);
-           
+                       
             obj.aeDataAcquisitor.addObserver(obj.preprocessor);
                         
             % Step 3 - Segmenting Setup
@@ -55,7 +52,7 @@ classdef AEncoderMonitoringSystem < CMSystem
             % Step 4 - Feature Extraction
             obj.aeEncoderExtractor = AEncoderMemoryExtractor(obj.sampleRate, obj.f_res);
             
-            obj.lowPassProcessor.addObserver(obj.aeEncoderExtractor);
+            obj.preprocessor.addObserver(obj.aeEncoderExtractor);
             
             extractor = DefaultFeatureExtractor(obj.sampleRate);
             extractor.name = 'RMS_Extractor';
@@ -64,7 +61,7 @@ classdef AEncoderMonitoringSystem < CMSystem
             extractor.initFeatureTransformations();
             obj.rmsExtractor = extractor;
             
-            obj.lowPassProcessor.addObserver(obj.rmsExtractor);
+            obj.preprocessor.addObserver(obj.rmsExtractor);
             
             obj.merger = MergeTransformer('Merger', 2);
             
@@ -83,7 +80,7 @@ classdef AEncoderMonitoringSystem < CMSystem
             obj.clusterPlotter = SimpleClusterPlotter();
             %obj.clusterTransitionPlotter = ClusterTransitionPlotter();
             
-            obj.lowPassProcessor.addObserver(obj.rawAEPlotter);
+            obj.preprocessor.addObserver(obj.rawAEPlotter);
             obj.clusteringModel.addObserver(obj.clusterPlotter);
             %obj.clusteringModel.addObserver(obj.clusterTransitionPlotter);
         end        

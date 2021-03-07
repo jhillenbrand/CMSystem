@@ -45,7 +45,7 @@ classdef AEncoderMemoryLearningStrategy < CMStrategy
             [locs, peaks, numOfPeaks] = PeakFinder.peaksByKneePointSearch(f, pMean, cmSystem.f_res, false);
             
             % fourier idea for hidden neurons
-            cmSystem.aeEncoderExtractor.autoencoder.setHiddenWidth(ceil(3 * meanPeaks) + 1);
+            cmSystem.aeEncoderExtractor.autoencoder.setHiddenWidth(ceil(3 * numOfPeaks) + 1);
             % train MyAutoencoder for meanPeak            
             cmSystem.aeEncoderExtractor.autoencoder.train(data);
             while ~cmSystem.aeEncoderExtractor.isIterativeTrainingComplete()
