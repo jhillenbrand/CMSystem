@@ -4,6 +4,7 @@ classdef Plotter < Reporter
     properties
         F = []; % figure variable
         numOfDataPoints = 0;
+        docked = true;
     end
     
     %% static variable for figure index
@@ -28,6 +29,9 @@ classdef Plotter < Reporter
             if ~noFigure                
                 obj.F = obj.incrementFigureIndex();
                 figure(obj.F);
+                if obj.docked
+                    set(gcf, 'WindowStyle', 'docked') % Insert the figure to dock
+                end
             end
         end
         

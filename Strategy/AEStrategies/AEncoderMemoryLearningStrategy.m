@@ -32,10 +32,11 @@ classdef AEncoderMemoryLearningStrategy < CMStrategy
             
             % prepare a mean f-p-spectrum
             pMean = [];
+            DATA = [];
             for i = 1 : obj.numOfAveragingWindows
                 cmSystem.aeDataAcquisitor.update([]);
-                data = [data, cmSystem.preprocessor.dataBuffer];
-                [f, p] = SignalAnalysis.fftPowerSpectrum(data, cmSystem.sampleRate / cmSystem.downsampleFactor);
+                DATA = [DATA, cmSystem.preprocessor.dataBuffer];
+                [f, p] = SignalAnalysis.fftPowerSpectrum(cmSystem.preprocessor.dataBuffer, cmSystem.sampleRate / cmSystem.downsampleFactor);
                 if isempty(pMean)
                     pMean = p;
                 else
@@ -47,10 +48,10 @@ classdef AEncoderMemoryLearningStrategy < CMStrategy
             % fourier idea for hidden neurons
             cmSystem.aeEncoderExtractor.autoencoder.setHiddenWidth(ceil(3 * numOfPeaks) + 1);
             % train MyAutoencoder for meanPeak            
-            cmSystem.aeEncoderExtractor.autoencoder.train(data);
+            cmSystem.aeEncoderExtractor.autoencoder.train(DATA);
             while ~cmSystem.aeEncoderExtractor.isIterativeTrainingComplete()
-                data = obj.getPreprocessorData(cmSystem);
-                cmSystem.aeEncoderExtractor.learn(data);
+                cmSystem.aeDataAcquisitor.update([]);
+                cmSystem.aeEncoderExtractor.learn(cmSystem.preprocessor.dataBuffer);
             end
             cmSystem.aeEncoderExtractor.firstAutoencoderTrained = true;
             disp(['trained new autoencoder (' num2str(length(cmSystem.aeEncoderExtractor.lastAutoencoders) + 1) ')']);

@@ -34,12 +34,12 @@ classdef AEPreprocessor < Preprocessor
         function newData = aePreprocFunc(data, sampleRate, lowPassFrequency, downsampleFactor, bitPrecision)
             %AEPREPROC(data, sampleRate, lowPassFrequency, downsampleFactor, bitPrecision)
             % Preprocessing Setup
-            tempData = SignalAnalysis.correctBitHickup(data, bitPrecision, true, false);
+            newData = SignalAnalysis.correctBitHickup(data, bitPrecision, true, false);
             if lowPassFrequency > 0
-                tempData = SignalAnalysis.lowpass2(tempData, sampleRate, lowPassFrequency);
+                newData = SignalAnalysis.lowpass2(newData, sampleRate, lowPassFrequency);
             end
             if downsampleFactor > 1
-                newData = downsample(tempData, downsampleFactor);
+                newData = downsample(newData, downsampleFactor);
             end
         end
     end
