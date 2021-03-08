@@ -52,7 +52,7 @@ classdef AEncoderMemoryLearningStrategy < CMStrategy
             while ~cmSystem.aeEncoderExtractor.isIterativeTrainingComplete()
                 cmSystem.aeDataAcquisitor.update([]);
                 cmSystem.aeEncoderExtractor.learn(cmSystem.preprocessor.dataBuffer);
-            end
+             end
             cmSystem.aeEncoderExtractor.firstAutoencoderTrained = true;
             disp(['trained new autoencoder (' num2str(length(cmSystem.aeEncoderExtractor.lastAutoencoders) + 1) ')']);
             

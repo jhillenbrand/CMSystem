@@ -16,7 +16,7 @@ classdef AEncoderMemoryExtractor < AutoencoderExtractor
         function obj = AEncoderMemoryExtractor(f_sr, f_res)
             %AENCODEREXTRACTOR
             obj@AutoencoderExtractor(f_sr, f_res);
-            obj.peakFinder = PeakFinder.defaultHighfrequencyFinder(f_sr, f_res);
+            %obj.peakFinder = PeakFinder.defaultHighfrequencyFinder(f_sr, f_res);
             obj.setDefaultAutoencoder();
             obj.setDefaultLearnOptions();
         end

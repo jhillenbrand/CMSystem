@@ -9,18 +9,18 @@ classdef AutoencoderExtractor < FeatureExtractor & LearnableInterface
         autoencoder = [];
         peakFinder = [];
         sampleRate = 2e6;   % sample rate of data to be processed [Hz]
-        fRes = 100; % targeted frequency resolution [Hz]
+        f_res = 100; % targeted frequency resolution [Hz]
     end
     
     methods
-        function obj = AutoencoderExtractor(sampleRate, fRes)
+        function obj = AutoencoderExtractor(sampleRate, f_res)
             if nargin < 1
                 sampleRate = 2e6;
             end
             if nargin < 2
-                fRes = 100;
+                f_res = 100;
             end
-            obj.fRes = fRes;
+            obj.f_res = f_res;
             obj.sampleRate = sampleRate;
             funcHandle = @(x)obj.predictMSE(x);
             transformation = Transformation(['Autoencoder MSE ' class(Transformation.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'], funcHandle);
@@ -77,7 +77,7 @@ classdef AutoencoderExtractor < FeatureExtractor & LearnableInterface
         end
             
         function setDefaultPeakFinder(obj)
-            obj.peakFinder = PeakFinder(obj.sampleRate, obj.fRes, obj.fRes);
+            obj.peakFinder = PeakFinder(obj.sampleRate, obj.f_res, obj.f_res);
             obj.peakFinder.setFourierTransformOptions('fft');
             obj.peakFinder.setThresholdOptions('none');
         end
