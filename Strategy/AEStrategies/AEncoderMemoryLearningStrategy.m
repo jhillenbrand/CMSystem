@@ -43,15 +43,23 @@ classdef AEncoderMemoryLearningStrategy < CMStrategy
                     pMean = (pMean * (i - 1) + p) / i;
                 end
             end
-            [locs, peaks, numOfPeaks] = PeakFinder.peaksByKneePointSearch(f, pMean, cmSystem.f_res, false);
-            
+%            [locs, peaks, numOfPeaks] = PeakFinder.peaksByKneePointSearch(f, pMean, cmSystem.f_res, false);
+            cmSystem.aeEncoderExtractor.peakFinder.sampleRate = cmSystem.sampleRate / cmSystem.downsampleFactor;
+            peaks = cmSystem.aeEncoderExtractor.peakFinder.apply(pMean,f);
+            numOfPeaks = peaks.num;
+
             % fourier idea for hidden neurons
             cmSystem.aeEncoderExtractor.autoencoder.setHiddenWidth(ceil(3 * numOfPeaks) + 1);
             % train MyAutoencoder for meanPeak            
             cmSystem.aeEncoderExtractor.autoencoder.train(DATA);
             while ~cmSystem.aeEncoderExtractor.isIterativeTrainingComplete()
-                cmSystem.aeDataAcquisitor.update([]);
-                cmSystem.aeEncoderExtractor.learn(cmSystem.preprocessor.dataBuffer);
+                DATA = [];
+                for i=1:20
+                    cmSystem.aeDataAcquisitor.update([]);
+                    data = cmSystem.preprocessor.dataBuffer;
+                    DATA = [DATA, data];
+                end
+                cmSystem.aeEncoderExtractor.learn(DATA);
              end
             cmSystem.aeEncoderExtractor.firstAutoencoderTrained = true;
             disp(['trained new autoencoder (' num2str(length(cmSystem.aeEncoderExtractor.lastAutoencoders) + 1) ')']);
@@ -61,7 +69,7 @@ classdef AEncoderMemoryLearningStrategy < CMStrategy
             cmSystem.aeEncoderExtractor.enable();
             cmSystem.rmsExtractor.enable();
             cmSystem.merger.enable();
-            cmSystem.lowPassProcessor.setDataPersistent(false);
+            %cmSystem.lowPassProcessor.setDataPersistent(false);
             out = true;
         end
     end    
