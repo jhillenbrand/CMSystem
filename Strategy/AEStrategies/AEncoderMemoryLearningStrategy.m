@@ -52,15 +52,15 @@ classdef AEncoderMemoryLearningStrategy < CMStrategy
             cmSystem.aeEncoderExtractor.autoencoder.setHiddenWidth(ceil(3 * numOfPeaks) + 1);
             % train MyAutoencoder for meanPeak            
             cmSystem.aeEncoderExtractor.autoencoder.train(DATA);
-            while ~cmSystem.aeEncoderExtractor.isIterativeTrainingComplete()
-                DATA = [];
-                for i=1:20
-                    cmSystem.aeDataAcquisitor.update([]);
-                    data = cmSystem.preprocessor.dataBuffer;
-                    DATA = [DATA, data];
-                end
-                cmSystem.aeEncoderExtractor.learn(DATA);
-             end
+%             while ~cmSystem.aeEncoderExtractor.isIterativeTrainingComplete()
+%                 DATA = [];
+%                 for i=1:20
+%                     cmSystem.aeDataAcquisitor.update([]);
+%                     data = cmSystem.preprocessor.dataBuffer;
+%                     DATA = [DATA, data];
+%                 end
+%                 cmSystem.aeEncoderExtractor.learn(DATA);
+%              end
             cmSystem.aeEncoderExtractor.firstAutoencoderTrained = true;
             disp(['trained new autoencoder (' num2str(length(cmSystem.aeEncoderExtractor.lastAutoencoders) + 1) ')']);
             

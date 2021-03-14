@@ -1,4 +1,4 @@
-classdef AEncoderExtractor < AutoencoderExtractor
+classdef AEncoderExtractor < AutoEncoderExtractor
     %AENCODEREXTRACTOR 
     
     properties
@@ -8,7 +8,7 @@ classdef AEncoderExtractor < AutoencoderExtractor
     methods
         function obj = AEncoderExtractor(f_sr, f_res)
             %AENCODEREXTRACTOR
-            obj@AutoencoderExtractor(f_sr, f_res);
+            obj@AutoEncoderExtractor(f_sr, f_res);
             obj.peakFinder = PeakFinder.defaultHighfrequencyFinder();
             obj.setDefaultAutoencoder();
             obj.setDefaultLearnOptions();

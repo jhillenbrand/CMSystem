@@ -2,7 +2,7 @@
 % VERSION 0.2
 % DATE 29.01.2021
 % DEPENDENCY Deep Learning Toolbox (trainautoencoder), Signal Processing Toolbox (findpeaks), MyAutoencoder.m, PeakFinder.m
-classdef AutoencoderExtractor < FeatureExtractor & LearnableInterface
+classdef AutoEncoderExtractor < FeatureExtractor & LearnableInterface
     %AUTOENCODEREXTRACTOR 
     
     properties
@@ -13,7 +13,7 @@ classdef AutoencoderExtractor < FeatureExtractor & LearnableInterface
     end
     
     methods
-        function obj = AutoencoderExtractor(sampleRate, f_res)
+        function obj = AutoEncoderExtractor(sampleRate, f_res)
             if nargin < 1
                 sampleRate = 2e6;
             end

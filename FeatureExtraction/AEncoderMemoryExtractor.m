@@ -1,4 +1,4 @@
-classdef AEncoderMemoryExtractor < AutoencoderExtractor
+classdef AEncoderMemoryExtractor < AutoEncoderExtractor
     %AENCODEREXTRACTOR 
     
     properties
@@ -15,7 +15,7 @@ classdef AEncoderMemoryExtractor < AutoencoderExtractor
     methods
         function obj = AEncoderMemoryExtractor(f_sr, f_res)
             %AENCODEREXTRACTOR
-            obj@AutoencoderExtractor(f_sr, f_res);
+            obj@AutoEncoderExtractor(f_sr, f_res);
             %obj.peakFinder = PeakFinder.defaultHighfrequencyFinder(f_sr, f_res);
             obj.setDefaultAutoencoder();
             obj.setDefaultLearnOptions();
@@ -59,12 +59,12 @@ classdef AEncoderMemoryExtractor < AutoencoderExtractor
                     'UseValidation',true,...
                     'ValidationFrequency', 5, ...
                     'ValidationPatience', 3, ...
-                    'Shuffle','never');
-                obj.autoencoder.setIterativeTrainingOptions(...
-                    'ConvergencePatience',3,...
-                    'ScoreFactor',0.9);
+                    'Shuffle','once');
                 obj.autoencoder.setNormalizationOptions('NormalizationMethod', 'MapZscoreDataset');
-                obj.autoencoder.setIterativeTrainingOptions('UseIterativeTraining',true); 
+%                 obj.autoencoder.setIterativeTrainingOptions(...
+%                     'ConvergencePatience',3,...
+%                     'ScoreFactor',0.9);
+                obj.autoencoder.setIterativeTrainingOptions('UseIterativeTraining',false); 
             end
         end
         
