@@ -6,10 +6,16 @@ classdef SimStreamAcquisitor < DataAcquisitor
     %RANDSINEACQUISITOR
     
     properties
-        files
-        bufferSize
-        stepSize
-        dataStream
+        files = {};
+        bufferSize = 0;
+        stepSize = 0;
+        dataStream = [];
+        plotFileFieldInds = [];        
+    end
+    
+    properties (Access = private)
+        fileFieldNameFig = [];
+        plotCounter = 1;
     end
     
     methods
@@ -26,6 +32,25 @@ classdef SimStreamAcquisitor < DataAcquisitor
         function newData = requestAvailableData(obj)
             %REQUESTAVAILABLEDATA(obj)
             newData = obj.dataStream.getNextTimeStep();
+            
+            % plot file name fields according to specified index
+            if ~isempty(obj.plotFileFieldInds)
+                if isempty(obj.fileFieldNameFig)
+                    obj.fileFieldNameFig = figure();
+                end
+                fieldValues = obj.dataStream.dataParserObj.FileNameFieldValues(obj.plotFileFieldInds);
+                figure(obj.fileFieldNameFig)
+                for f = 1 : length(fieldValues)
+                    numValue = DataParser.removeNonNumericPart(fieldValues{f});
+                    titleValue = strrep(fieldValues{f}, num2str(numValue{1}), '');
+                    subplot(2, 1, f)
+                    hold on
+                    plot(obj.plotCounter, str2double(numValue{1}), [P.COLOR_SYMBOLS{f} 'o'])
+                    title(titleValue)
+                    hold off
+                    obj.plotCounter = obj.plotCounter + 1;
+                end
+            end
         end
         
         function newData = requestData(obj, nSamples)

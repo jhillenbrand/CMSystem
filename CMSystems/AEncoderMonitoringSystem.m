@@ -40,7 +40,9 @@ classdef AEncoderMonitoringSystem < CMSystem
             % Step 1 - Data Acquisition Setup
             aeFiles = DataParser.getFilePaths(obj.AE_MAT_FOLDER, obj.AE_FILE_TYPE, obj.AE_FILE_NAME_ID, true);
             dp = DataParser('FileType', obj.AE_FILE_TYPE);
-            obj.aeDataAcquisitor = SimStreamAcquisitor(dp, aeFiles, obj.windowSize, obj.windowSize);
+            skipWindows = 10; 
+            obj.aeDataAcquisitor = SimStreamAcquisitor(dp, aeFiles, obj.windowSize, skipWindows * obj.windowSize);
+            obj.aeDataAcquisitor.plotFileFieldInds = [4, 5];
             
             % Step 2 - Preprocessing Setup
             obj.preprocessor = AEPreprocessor('AE_PREPROCESSOR', obj.sampleRate, obj.lowPassFrequency, obj.downsampleFactor, obj.bitPrecision);
