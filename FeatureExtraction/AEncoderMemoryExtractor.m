@@ -10,6 +10,14 @@ classdef AEncoderMemoryExtractor < AutoEncoderExtractor
         thisPeakFindIterations = 0;
         peakFindConvergeThreshold = 0.1;
         lastMeanPeak = -1;
+        
+        defaultTrainingOptions = {'MaxEpochs', 1000};
+        defaultValidationOptions = {'EarlyStopping', true,...
+                    'UseValidation',true,...
+                    'ValidationFrequency', 5, ...
+                    'ValidationPatience', 3, ...
+                    'Shuffle','once'};
+        defaultNormalizationOptions = {'NormalizationMethod', 'MapZscoreDataset'};
     end
     
     methods
@@ -41,26 +49,22 @@ classdef AEncoderMemoryExtractor < AutoEncoderExtractor
         end
     end
     
-    methods (Access = private)
+    methods
         function setDefaultAutoencoder(obj)
-            obj.autoencoder = MyDeepAutoencoder(7,1);
+            obj.autoencoder = MyDeepAutoencoder(7, 1);
             %obj.autoencoder = MyShallowAutoencoder(7);
             obj.setDefaultLearnOptions();
         end
         
         function setDefaultLearnOptions(obj)
             if isa(obj.autoencoder, class(MyShallowAutoencoder.empty))
-                obj.autoencoder.setTrainingOptions('MaxEpochs',1000);
-                obj.autoencoder.setValidationOptions('EarlyStopping', true);
-                obj.autoencoder.setNormalizationOptions('NormalizationMethod', 'MapZscoreDataset');
+                obj.autoencoder.setTrainingOptions(obj.defaultTrainingOptions);
+                obj.autoencoder.setValidationOptions(obj.defaultValidationOptions);
+                obj.autoencoder.setNormalizationOptions(obj.defaultNormalizationOptions);
             else
-                obj.autoencoder.setTrainingOptions('MaxEpochs',1000);
-                obj.autoencoder.setValidationOptions('EarlyStopping', true,...
-                    'UseValidation',true,...
-                    'ValidationFrequency', 5, ...
-                    'ValidationPatience', 3, ...
-                    'Shuffle','once');
-                obj.autoencoder.setNormalizationOptions('NormalizationMethod', 'MapZscoreDataset');
+                obj.autoencoder.setTrainingOptions(obj.defaultTrainingOptions{:});
+                obj.autoencoder.setValidationOptions(obj.defaultValidationOptions{:});
+                obj.autoencoder.setNormalizationOptions(obj.defaultNormalizationOptions{:});
 %                 obj.autoencoder.setIterativeTrainingOptions(...
 %                     'ConvergencePatience',3,...
 %                     'ScoreFactor',0.9);
@@ -75,7 +79,8 @@ classdef AEncoderMemoryExtractor < AutoEncoderExtractor
                 obj.setDefaultLearnOptions();
                 obj.firstAutoencoderTrained = false;
             end
-            obj.autoencoder.retrainIterative(data);
+            %obj.autoencoder.retrainIterative(data);
+            obj.autoencoder.train(data);
         end
     end
 end

@@ -30,7 +30,7 @@ classdef AEncoderExtractor < AutoEncoderExtractor
         end
     end
     
-    methods (Access = private)
+    methods
         function setDefaultAutoencoder(obj)
             obj.autoencoder = MyDeepAutoencoder(10,3);            
         end

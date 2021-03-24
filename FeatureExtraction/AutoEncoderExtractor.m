@@ -10,6 +10,7 @@ classdef AutoEncoderExtractor < FeatureExtractor & LearnableInterface
         peakFinder = [];
         sampleRate = 2e6;   % sample rate of data to be processed [Hz]
         f_res = 100; % targeted frequency resolution [Hz]
+        useSpectrum = false; % if set to true the input data from previous DataTransformer is converted into frequency spectrum in update step
     end
     
     methods
@@ -48,6 +49,12 @@ classdef AutoEncoderExtractor < FeatureExtractor & LearnableInterface
             %   number of windows
             %   or
             %   data is a f x 1 vector
+            
+            % convert to spectrum if required
+            if obj.useSpectrum
+               [f, p] = SignalAnalysis.fftPowerSpectrum(data, obj.sampleRate);
+               data = p;
+            end
             data_Pred = obj.autoencoder.predict(data);
             newData = mean(SignalAnalysis.getMSE(data, data_Pred, 2));
         end
@@ -67,7 +74,7 @@ classdef AutoEncoderExtractor < FeatureExtractor & LearnableInterface
         end
     end
     
-    methods (Access = private)
+    methods
         %% - defaultLearn
         function defaultLearn(obj, data)            
             obj.setDefaultPeakFinder();

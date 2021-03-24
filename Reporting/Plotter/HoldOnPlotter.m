@@ -46,14 +46,22 @@ classdef HoldOnPlotter < Plotter
                 x = obj.numOfDataPoints + 1 : 1 : obj.numOfDataPoints + length(data);
                 x = x(:);
                 data = data(:);
-                hold on                    
-                plot(x, data, 'Color', P.bluegreen)
+                hold on       
+                if length(data) == 1
+                    plot(x, data, 'ro')
+                else
+                    plot(x, data, 'Color', P.bluegreen)
+                end
                 hold off
                 drawnow 
             else
                 obj.numOfDataPoints = 0;
                 x = obj.numOfDataPoints + 1 : 1 : obj.numOfDataPoints + length(data);
-                plot(x, data, 'Color', P.bluegreen)
+                if length(data) == 1
+                    plot(x, data, 'ro')
+                else
+                    plot(x, data, 'Color', P.bluegreen)
+                end
                 drawnow
                 obj.holdOnCount = 0;                
             end

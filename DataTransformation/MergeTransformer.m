@@ -3,8 +3,8 @@ classdef MergeTransformer < DataTransformer
     %   one single output before transferring
     
     properties
-        transformCount = 0;
-        forks = [];
+        transformCount = 0; % current count of received inputs
+        forks = []; % number of different inputs that shall be merged
     end
     
     methods
