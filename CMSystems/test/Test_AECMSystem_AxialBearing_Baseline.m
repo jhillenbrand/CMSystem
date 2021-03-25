@@ -47,8 +47,8 @@ aeSystem.saveToFilePath = 'cmsystem_blank_save.mat';
 
 aeSystem.initTransformers();
 
-%aeSystem.clusterPlotter.disable();
-%aeSystem.rawAEPlotter.disable();
+aeSystem.clusterPlotter.disable();
+aeSystem.rawAEPlotter.disable();
 
 aeSystem.saveToFile();
 

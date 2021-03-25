@@ -17,7 +17,7 @@ classdef AEncoderMemoryExtractor < AutoEncoderExtractor
                     'ValidationFrequency', 5, ...
                     'ValidationPatience', 3, ...
                     'Shuffle','once'};
-        defaultNormalizationOptions = {'NormalizationMethod', 'MapZscoreDataset'};
+        defaultNormalizationOptions = {'NormalizationMethod', 'MapZscore'};
     end
     
     methods
