@@ -3,6 +3,7 @@ classdef SimpleClusterBoundaryModeler < Modeler
         
     properties
         boundaryClusterer = [];
+        withTimestamp = true;
     end
     
     methods
