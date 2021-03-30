@@ -46,7 +46,7 @@ classdef SimStreamAcquisitor < DataAcquisitor
                         titleValue = strrep(fieldValues{f}, num2str(numValue{1}), '');
                         subplot(2, 1, f)
                         hold on
-                        plot(obj.plotCounter, str2double(numValue{1}), [P.COLOR_SYMBOLS{f} 'o'])
+                        plot(obj.plotCounter, str2double(numValue{1}) )%[P.COLOR_SYMBOLS{f} 'o'])
                         title(titleValue)
                         hold off
                         obj.plotCounter = obj.plotCounter + 1;

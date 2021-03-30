@@ -58,6 +58,19 @@ classdef AEncoderMemoryExtractor < AutoEncoderExtractor
         
         function setDefaultLearnOptions(obj)
             if isa(obj.autoencoder, class(MyShallowAutoencoder.empty))
+<<<<<<< HEAD
+                obj.autoencoder.setTrainingOptions('MaxEpochs',1000);
+                obj.autoencoder.setValidationOptions('EarlyStopping', true);
+                obj.autoencoder.setNormalizationOptions('NormalizationMethod', 'MapZscore');
+            else
+                obj.autoencoder.setTrainingOptions('MaxEpochs',1000);
+                obj.autoencoder.setValidationOptions('EarlyStopping', true,...
+                    'UseValidation',true,...
+                    'ValidationFrequency', 5, ...
+                    'ValidationPatience', 3, ...
+                    'Shuffle','once');
+                obj.autoencoder.setNormalizationOptions('NormalizationMethod', 'MapZscore');
+=======
                 obj.autoencoder.setTrainingOptions(obj.defaultTrainingOptions);
                 obj.autoencoder.setValidationOptions(obj.defaultValidationOptions);
                 obj.autoencoder.setNormalizationOptions(obj.defaultNormalizationOptions);
@@ -65,9 +78,11 @@ classdef AEncoderMemoryExtractor < AutoEncoderExtractor
                 obj.autoencoder.setTrainingOptions(obj.defaultTrainingOptions{:});
                 obj.autoencoder.setValidationOptions(obj.defaultValidationOptions{:});
                 obj.autoencoder.setNormalizationOptions(obj.defaultNormalizationOptions{:});
-                obj.autoencoder.setIterativeTrainingOptions(...
-                    'ConvergencePatience',3,...
-                    'ScoreFactor',0.9);
+>>>>>>> origin/v0.2_kistner
+%                 obj.autoencoder.setIterativeTrainingOptions(...
+%                     'ConvergencePatience',3,...
+%                     'ScoreFactor',0.9);
+                obj.autoencoder.setIterativeTrainingOptions('UseIterativeTraining',false); 
             end
         end
         
@@ -78,8 +93,8 @@ classdef AEncoderMemoryExtractor < AutoEncoderExtractor
                 obj.setDefaultLearnOptions();
                 obj.firstAutoencoderTrained = false;
             end
-            obj.autoencoder.retrainIterative(data);
-            %obj.autoencoder.train(data);
+            %obj.autoencoder.retrainIterative(data);
+            obj.autoencoder.train(data);
         end
     end
 end
