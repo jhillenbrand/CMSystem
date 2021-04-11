@@ -38,6 +38,7 @@ classdef SimStreamAcquisitor < DataAcquisitor
                 if ~isempty(obj.plotFileFieldInds)
                     if isempty(obj.fileFieldNameFig)
                         obj.fileFieldNameFig = figure();
+                        set(gcf, 'WindowStyle', 'docked')
                     end
                     fieldValues = obj.dataStream.dataParserObj.FileNameFieldValues(obj.plotFileFieldInds);
                     figure(obj.fileFieldNameFig)
