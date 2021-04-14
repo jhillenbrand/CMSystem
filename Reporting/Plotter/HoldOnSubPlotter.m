@@ -30,9 +30,7 @@ classdef HoldOnSubPlotter < Plotter
     
     %% Interface Methods
     methods
-        function newData = transform(obj, data)
-            % set focus to the figure
-            figure(obj.F);
+        function report(obj, data)            
             % check if maxHoldOn is reached and then clear plots
             if obj.holdOnCount > obj.maxHoldOn 
                 for p = 1 : obj.numOfSubplots
@@ -61,7 +59,6 @@ classdef HoldOnSubPlotter < Plotter
             else
                 error(['undefined data dimensions for ' class(HoldOnPlotter)])
             end
-            newData = data;
         end
     end
     

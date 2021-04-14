@@ -18,9 +18,7 @@ classdef HoldOnPlotter < Plotter
     
     %% Interface Methods
     methods
-        function newData = transform(obj, data)
-            % set focus to the figure
-            figure(obj.F);
+        function report(obj, data)
             % data is assumed to be n x m, where n is the number of samples
             % and m the number fo features
             if size(data, 2) == 1
@@ -35,7 +33,6 @@ classdef HoldOnPlotter < Plotter
             else
                 error(['undefined data dimensions for ' class(HoldOnPlotter)])
             end
-            newData = data;
         end
     end
     

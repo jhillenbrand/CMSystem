@@ -26,13 +26,7 @@ classdef MovingWindowPlotter < Plotter
     
     %% Interface Methods
     methods
-        function newData = transform(obj, data)
-            % set focus to the figure, if not empty
-            %   empty figure can be the case if plothandle in App uiaxes is
-            %   used instead
-            if ~isempty(obj.F)
-                figure(obj.F);
-            end
+        function report(obj, data)
             % data is assumed to be n x m, where n is the number of samples
             % and m the number fo features
             if size(data, 2) == 1

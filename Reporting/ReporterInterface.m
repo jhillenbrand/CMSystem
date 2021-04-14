@@ -2,7 +2,7 @@ classdef ReporterInterface < handle
     %REPORTERINTERFACE
     
     methods (Abstract)
-        report(obj);
+        report(obj, data);
     end
 end
 

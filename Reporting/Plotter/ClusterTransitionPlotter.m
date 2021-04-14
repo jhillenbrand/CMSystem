@@ -3,28 +3,30 @@
 % DATE 02.01.2021
 % DEPENDENCY HoldOnPlotter.m
 classdef ClusterTransitionPlotter < Plotter
-    %CLUSTERTRANSITIONPLOTTER 
-    
+    %CLUSTERTRANSITIONPLOTTER   
     properties
         
     end
     
     methods
         function obj = ClusterTransitionPlotter()
-            %CLUSTERTRANSITIONPLOTTER 
+            %CLUSTERTRANSITIONPLOTTER
+            obj@Plotter();
         end
     end
     
     %% Interface Methods
     methods
-        function newData = transform(obj, data)
-            if isa(data, class(ClusterBoundaryTracking.empty))
-                figure(obj.F);
-                data.plotTransitions();
+        function report(obj, data)
+            if ~isempty(data)
+                if isa(data, class(ClusterTransition.empty))
+                    ClusterTracking.plotTransitionVector(data);
+                else
+                    error(['data is not of type ' class(ClusterTransition.empty)])
+                end
             else
-                error(['data is not of type ' class(ClusterBoundaryTracking.empty)])
+                warning([class(ClusterTransitionPlotter.empty) ' --> no data was passed'])
             end
-            newData = data;
         end
     end
 end

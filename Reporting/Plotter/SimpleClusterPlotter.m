@@ -6,7 +6,7 @@ classdef SimpleClusterPlotter < Plotter
     %SIMPLECLUSTERPLOTTER
     
     properties
-        
+        plotCenterTrend = true;
     end
     
     methods
@@ -17,23 +17,17 @@ classdef SimpleClusterPlotter < Plotter
     
     %% Interface Methods
     methods
-        function newData = transform(obj, data)
+        function report(obj, data)
             if ~isempty(data)
-                if isa(data, 'ClusterState')
-                    figure(obj.F);
-                    ClusteringTools.plotCluster(data.dataPoints, data.clusterIndices, true, false);
+                if isa(data, class(SimpleBoundaryClusterer.empty))
+                    data.clusterStates(end).plot(obj.plotCenterTrend);
                 else
                     error(['data is not of type ClusterState'])
                 end
             else
                 warning('data was empty');
             end
-            newData = data;
         end
-    end
-    
-    methods
-        
     end
 end
 

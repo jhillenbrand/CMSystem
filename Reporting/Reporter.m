@@ -6,9 +6,6 @@ classdef Reporter < DataTransformer & ReporterInterface
     end
     
     methods
-        function report(obj)
-            disp('Reported');
-        end
     end
 end
 
