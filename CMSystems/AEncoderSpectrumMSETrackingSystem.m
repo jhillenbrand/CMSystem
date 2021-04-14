@@ -32,7 +32,7 @@ classdef AEncoderSpectrumMSETrackingSystem < CMSystem
         function obj = AEncoderSpectrumMSETrackingSystem()
             %AENCODERSPECTRUMMONITORINGSYSTEM
             obj.name = 'AEncoderSpectrumMSETrackingSystem_v0.1';
-            obj.addStrategy(AEncoderSpectrumMSETrackingStrategy('LearningStrategy'));
+            obj.addStrategy(AEncoderSpectrumMSETrackingLearningStrategy('LearningStrategy'));
             obj.addStrategy(AEncoderSpectrumMonitoringStrategy('MonitoringStrategy'));            
         end
         

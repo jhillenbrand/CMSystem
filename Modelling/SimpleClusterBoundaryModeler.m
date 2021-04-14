@@ -18,7 +18,7 @@ classdef SimpleClusterBoundaryModeler < Modeler
         function setDefault(obj)
             clusterer = SimpleBoundaryClusterer();
             
-            clusterer.hyperparameters.MinSizeDataPoints = 25;
+            clusterer.hyperparameters.MinSizeDataPoints = 250;
             clusterer.hyperparameters.NormalizeDataPoints = true; 
                         
             obj.boundaryClusterer = clusterer;
