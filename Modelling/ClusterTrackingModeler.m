@@ -25,14 +25,14 @@ classdef ClusterTrackingModeler < Modeler
             if ~isempty(data)
                 if isa(data, class(SimpleBoundaryClusterer.empty))
                     % get last two clusterStates
-                    if length(data.clusterStates) > 1
+                    if length(data.clusterStates) > 2
                         cs_i = data.clusterStates(end - 1);
                         cs_j = data.clusterStates(end);
                         transitions = obj.clusterTracker.track(cs_i, cs_j);
                         cs_i.reduceMemory();
                         newData = transitions;
                     else
-                        warning([class(ClusterTrackingModeler.empty) ' --> waiting for second clusterState']);
+                        warning([class(ClusterTrackingModeler.empty) ' --> waiting for second complete clusterState']);
                     end
                 else
                     error([class(ClusterTrackingModeler.empty) ' --> data passed to transform step must be of class ' class(ClusterTrackingModeler.empty)]);
