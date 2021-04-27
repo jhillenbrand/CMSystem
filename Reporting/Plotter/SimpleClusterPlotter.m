@@ -6,12 +6,19 @@ classdef SimpleClusterPlotter < Plotter
     %SIMPLECLUSTERPLOTTER
     
     properties
-        
+        frames = [];
+        recordPlot = [];
     end
     
     methods
-        function obj = SimpleClusterPlotter()
+        function obj = SimpleClusterPlotter(recordPlot)
             %SIMPLECLUSTERPLOTTER 
+            if nargin < 1
+                obj.recordPlot = false;
+            else
+                obj.recordPlot = recordPlot;
+            end
+            
         end
     end
     
@@ -22,6 +29,9 @@ classdef SimpleClusterPlotter < Plotter
                 if isa(data, 'ClusterState')
                     figure(obj.F);
                     ClusteringTools.plotCluster(data.dataPoints, data.clusterIndices, true, false);
+                    if obj.recordPlot
+                        obj.frames = [obj.frames; getframe(gcf)];
+                    end
                 else
                     error(['data is not of type ClusterState'])
                 end

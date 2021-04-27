@@ -4,7 +4,7 @@ classdef AEncoderSpectrumLearningStrategy_v2 < CMStrategy
     %   Autoencoder
     
     properties
-        numOfAveragingWindows = 20;
+        numOfAveragingWindows = 10;
     end
     
     methods
@@ -17,7 +17,8 @@ classdef AEncoderSpectrumLearningStrategy_v2 < CMStrategy
     methods 
         function out = execute(obj, cmSystem)
             % check if monitoring system is of correct type            
-            if ~strcmp(class(cmSystem), class(AEncoderSpectrumMonitoringSystem_v2.empty))
+            if ~strcmp(class(cmSystem), class(AEncoderSpectrumMonitoringSystem_v2.empty))&&...
+                ~strcmp(class(cmSystem), class(AEncoderAxialBearingSpectrumMonitoringSystem_v2.empty))
                 error('wrong CMSystem was passed');
             end
             
@@ -26,39 +27,48 @@ classdef AEncoderSpectrumLearningStrategy_v2 < CMStrategy
             cmSystem.aeEncoderExtractor.disable();
             cmSystem.timeAppender.disable();
             cmSystem.clusterPlotter.disable();
-            % make preprocessor data before extractor persistent
-            cmSystem.preprocessor.setDataPersistent(true);
+            % make segmenter data before extractor persistent
+            cmSystem.segmenter.setDataPersistent(true);
+                       
+            cmSystem.aeDataAcquisitor.learningMode();
             
             % prepare a mean f-p-spectrum
-            pMean = [];
-            DATA = [];
-            for i = 1 : obj.numOfAveragingWindows
-                cmSystem.aeDataAcquisitor.update([]);
-                [f, p] = SignalAnalysis.fftPowerSpectrum(cmSystem.preprocessor.dataBuffer, cmSystem.sampleRate / cmSystem.downsampleFactor);
-                DATA = [DATA, p];
-                if isempty(pMean)
-                    pMean = p;
-                else
-                    pMean = (pMean * (i - 1) + p) / i;
-                end
-            end
+            cmSystem.aeDataAcquisitor.update([]);
+            
+            [f, DATA] = SignalAnalysis.fftPowerSpectrum(cmSystem.segmenter.dataBuffer, cmSystem.sampleRate / cmSystem.downsampleFactor);
+%            pMean = mean(DATA(:,1:obj.numOfAveragingWindows),2);  
+
 %            [locs, peaks, numOfPeaks] = PeakFinder.peaksByKneePointSearch(f, pMean, cmSystem.f_res, false);
-            cmSystem.aeEncoderExtractor.peakFinder.sampleRate = cmSystem.sampleRate / cmSystem.downsampleFactor;
-            [locs, peaks, numOfPeaks] = cmSystem.aeEncoderExtractor.peakFinder.peaksByKneePointSearch(f, pMean, cmSystem.f_res, false, 2);
+%            cmSystem.aeEncoderExtractor.peakFinder.sampleRate = cmSystem.sampleRate / cmSystem.downsampleFactor;
+%            [~, ~, numOfPeaks] = cmSystem.aeEncoderExtractor.peakFinder.peaksByKneePointSearch(f(:,1), pMean, cmSystem.f_res, false, 2);
+            
+            peaks = cmSystem.aeEncoderExtractor.peakFinder.apply(double(cmSystem.segmenter.dataBuffer)');
+            numOfPeaks = ceil(peaks.mean);
             
             % fourier idea for hidden neurons
             cmSystem.aeEncoderExtractor.autoencoder.setHiddenWidth(numOfPeaks);
-            % train MyAutoencoder for meanPeak            
+            % train MyAutoencoder for meanPeak   
+            
             cmSystem.aeEncoderExtractor.autoencoder.train(DATA);
+            
+            while ~cmSystem.aeEncoderExtractor.autoencoder.iterativeTrainingOptions.TrainingState.Completed
+                cmSystem.aeDataAcquisitor.update([]);
+                [f, DATA] = SignalAnalysis.fftPowerSpectrum(cmSystem.segmenter.dataBuffer, cmSystem.sampleRate / cmSystem.downsampleFactor);
+                cmSystem.aeEncoderExtractor.autoencoder.retrainIterative(DATA);
+            end
+
             cmSystem.aeEncoderExtractor.firstAutoencoderTrained = true;
             disp(['trained new autoencoder (' num2str(length(cmSystem.aeEncoderExtractor.lastAutoencoders) + 1) ')']);
+            
+            % prepare data acquisitor for monitoring
+            cmSystem.aeDataAcquisitor.monitoringMode();
             
             % enable DataTransformers back
             cmSystem.clusteringModel.enable();
             cmSystem.aeEncoderExtractor.enable();
             cmSystem.timeAppender.enable();
             cmSystem.clusterPlotter.enable();
-            %cmSystem.lowPassProcessor.setDataPersistent(false);
+            cmSystem.segmenter.setDataPersistent(false);
             out = true;
         end
     end    

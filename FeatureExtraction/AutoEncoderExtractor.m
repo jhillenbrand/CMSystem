@@ -56,7 +56,7 @@ classdef AutoEncoderExtractor < FeatureExtractor & LearnableInterface
                data = p;
             end
             data_Pred = obj.autoencoder.predict(data);
-            newData = mean(SignalAnalysis.getMSE(data, data_Pred, 2));
+            newData = mean(SignalAnalysis.getMSE(data, data_Pred, 1));
         end
     end
     
@@ -85,11 +85,8 @@ classdef AutoEncoderExtractor < FeatureExtractor & LearnableInterface
             
         function setDefaultPeakFinder(obj)
             obj.peakFinder = PeakFinder(obj.sampleRate, obj.f_res, obj.f_res);
-%             obj.peakFinder.setFourierTransformOptions('fft');
-%             obj.peakFinder.setThresholdOptions('none');
-            obj.peakFinder.setFourierTransformOptions('none');
-            obj.peakFinder.setThresholdOptions('sumOfMeanAndStd',true,'highPowerFrequencies',1, 'sample');
-
+            obj.peakFinder.setFourierTransformOptions('autoAveragedSpectrum');
+            obj.peakFinder.setThresholdOptions('sumOfMeanAndStd',true,'recursivePeakFinding',1, 'sample');
         end
         
         function setDefaultAutoencoder(obj)

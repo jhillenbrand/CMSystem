@@ -11,20 +11,25 @@ classdef AEncoderMemoryExtractor < AutoEncoderExtractor
         peakFindConvergeThreshold = 0.1;
         lastMeanPeak = -1;
         
-        defaultTrainingOptions = {'MaxEpochs', 1000};
+        defaultTrainingOptions = {'MaxEpochs', 200};
         defaultValidationOptions = {'EarlyStopping', true,...
                     'UseValidation',true,...
                     'ValidationFrequency', 5, ...
-                    'ValidationPatience', 3, ...
+                    'ValidationPatience', 5, ...
                     'Shuffle','once'};
-        defaultNormalizationOptions = {'NormalizationMethod', 'MapZscore'};
+        defaultNormalizationOptions = {'NormalizationMethod', 'MapZscore'}
+        defaultIterativeTrainingOptions ={'ConvergencePatience',3,...
+                         'ScoreFactor',0.9};
+                     
+                        
+                        
     end
     
     methods
         function obj = AEncoderMemoryExtractor(f_sr, f_res)
             %AENCODEREXTRACTOR
             obj@AutoEncoderExtractor(f_sr, f_res);
-            %obj.peakFinder = PeakFinder.defaultHighfrequencyFinder(f_sr, f_res);
+            obj.peakFinder = PeakFinder.defaultHighfrequencyFinder(f_sr, f_res);
             obj.setDefaultAutoencoder();
             obj.setDefaultLearnOptions();
         end

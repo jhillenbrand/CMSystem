@@ -30,12 +30,13 @@ classdef DataAcquisitor < DataTransformer & DataAcquisitorInterface
     end
     
     methods 
-%         function newData = update(obj, data)
-%             obj.active = true;
-%             transformedData = obj.transform();
-%             newData = obj.transfer(transformedData);
-%             obj.active = false;            
-%         end
+        function newData = update(obj, data)
+%            obj.active = true;
+            transformedData = obj.transform();
+            obj.transfer(transformedData);
+%            newData = obj.transfer(transformedData);
+%            obj.active = false;            
+        end
         
         function newData = transform(obj, data)
             if obj.requestOnlyAvailable
