@@ -6,7 +6,6 @@ classdef DataTransformer < DataTransformerInterface
     %DATATRANSFORMER
     
     properties
-        L = JLog();
         name = [class(DataTransformer.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'];
         observers = DataTransformer.empty();
         transformations = Transformation.empty();
