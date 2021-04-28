@@ -45,8 +45,9 @@ classdef AEPreprocessor < Preprocessor
         function newData = aePreprocFunc(data, sampleRate, lowPassFrequency, downsampleFactor, bitPrecision, removeStillstand, stillstandLowerLimit, stillstandUpperLimit)
             %AEPREPROC(data, sampleRate, lowPassFrequency, downsampleFactor, bitPrecision)
             % Preprocessing Setup
+            newData = data;
             if bitPrecision > 0
-                newData = SignalAnalysis.correctBitHickup(data, bitPrecision, true, false);
+                newData = SignalAnalysis.correctBitHickup(newData, bitPrecision, true, false);
             end
             if lowPassFrequency > 0
                 newData = SignalAnalysis.lowpass2(newData, sampleRate, lowPassFrequency, 0.95);
@@ -57,7 +58,7 @@ classdef AEPreprocessor < Preprocessor
             if removeStillstand
                 % remove stillstand sections if present defined by noise
                 % lower and upper limit
-                newData = SignalAnalysis.removeWindowsInRange(data, stillstandLowerLimit, stillstandUpperLimit, ceil(sampleRate * 0.1), false);
+                newData = SignalAnalysis.removeWindowsInRange(newData, stillstandLowerLimit, stillstandUpperLimit, ceil(sampleRate * 0.1), false);
             end
         end
     end

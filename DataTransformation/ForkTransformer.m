@@ -24,7 +24,7 @@ classdef ForkTransformer < DataTransformer
     end
     
     %% Static Methods
-    methods
+    methods (Static)
         function newData = fork(data, dataColumns)
             newData = data(:, dataColumns);
         end
