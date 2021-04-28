@@ -9,6 +9,8 @@ fwSeg = FixedWindowSegmenter(1000);
 
 %%
 ex = DefaultFeatureExtractor(50e3);
+ex.transformToRMS = true;
+ex.transformToMeanFrequency = true;
 
 %%
 plotter = HoldOnPlotter();

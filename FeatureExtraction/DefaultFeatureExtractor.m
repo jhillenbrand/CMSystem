@@ -6,11 +6,11 @@ classdef DefaultFeatureExtractor < FeatureExtractor
         sampleRate = 0;
         
         % activate features
-        transformToRMS = true;
+        transformToRMS = false;
         transformToMin = false;
         transformToMax = false;
         transformToMean = false;
-        transformToPeakFactor = true;
+        transformToPeakFactor = false;
         transformToStd = false;
         transformToPeak2Peak = false;
         transformToImpulseFactor = false;
@@ -21,7 +21,7 @@ classdef DefaultFeatureExtractor < FeatureExtractor
         transformToEnergy = false;
         transformToBinnedEntropy = false;
         transformToSkewness = false;
-        transformToMeanFrequency = true;
+        transformToMeanFrequency = false;
         transformToCenterFrequency = false;
         transformToCountZeroCrossings = false;
     end

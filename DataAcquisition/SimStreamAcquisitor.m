@@ -32,7 +32,7 @@ classdef SimStreamAcquisitor < DataAcquisitor
         function newData = requestAvailableData(obj)
             %REQUESTAVAILABLEDATA(obj)
             if obj.dataStream.moreDataAvailable
-                newData = obj.dataStream.getNextTimeStep();
+                newData = obj.dataStream.nextData();
 
                 % plot file name fields according to specified index
                 if ~isempty(obj.plotFileFieldInds)
