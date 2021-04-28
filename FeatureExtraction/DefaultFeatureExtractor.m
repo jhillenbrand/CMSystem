@@ -9,6 +9,7 @@ classdef DefaultFeatureExtractor < FeatureExtractor
         transformToRMS = false;
         transformToMin = false;
         transformToMax = false;
+        transformToMaxAbs = false;
         transformToMean = false;
         transformToPeakFactor = false;
         transformToStd = false;
@@ -55,6 +56,10 @@ classdef DefaultFeatureExtractor < FeatureExtractor
             end
             if obj.transformToMax
                 transformation = FeatureTransformation('MAX', @max);
+                obj.addTransformation(transformation);
+            end
+            if obj.transformToMaxAbs
+                transformation = FeatureTransformation('MAX-ABS', @(x)max(abs(x)));
                 obj.addTransformation(transformation);
             end
             if obj.transformToMean
