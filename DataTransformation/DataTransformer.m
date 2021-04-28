@@ -58,9 +58,13 @@ classdef DataTransformer < DataTransformerInterface
         %% - transfer
         function transfer(obj, data)
             %TRANSFER(obj, data)
-            for o = 1 : length(obj.observers)
-                observer = obj.observers(o);
-                observer.update(data);
+            if ~isempty(data)
+                for o = 1 : length(obj.observers)
+                    observer = obj.observers(o);
+                    observer.update(data);
+                end
+            else
+                warning(['no data for transfer from ' obj.name])
             end
         end
     end
