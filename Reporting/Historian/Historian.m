@@ -19,7 +19,13 @@ classdef Historian < Reporter
         end
         
         function report(obj, data)
-            obj.dataBuffer = [obj.dataBuffer; data];
+            if isempty(obj.dataBuffer)
+                obj.dataBuffer = [obj.dataBuffer; data];
+            elseif size(obj.dataBuffer, 2) == size(data, 2)
+                obj.dataBuffer = [obj.dataBuffer; data];
+            else
+                error('oops');
+            end
         end
     end
 end

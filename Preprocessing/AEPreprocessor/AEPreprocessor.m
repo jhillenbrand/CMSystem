@@ -60,6 +60,9 @@ classdef AEPreprocessor < Preprocessor
                 % lower and upper limit
                 newData = SignalAnalysis.removeWindowsInRange(newData, stillstandLowerLimit, stillstandUpperLimit, ceil(sampleRate * 0.1), false);
             end
+            if isempty(newData)
+                newData = [NaN; NaN];
+            end
         end
     end
 end

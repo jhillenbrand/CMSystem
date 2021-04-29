@@ -150,6 +150,9 @@ classdef SyncedSimStreamAcquisitor < DataAcquisitor
             %mat = [[t newData zeros(length(t),size(dataColumnNames,1))]; [t_log zeros(length(t_log),1) d_log]];
             %sortrows(mat,1);
             %---------------------------------------------------------------
+            if isempty(newData)
+                disp('oops')
+            end
         end
         
         function newData = requestData(obj, nSamples)
