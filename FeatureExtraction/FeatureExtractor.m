@@ -6,13 +6,29 @@ classdef FeatureExtractor < DataTransformer
     %FEATUREEXTRACTOR 
     
     properties
-        
+        removeNaN = false;
     end
     
     methods
         %% - transform
         function newData = transform(obj, data)
             %TRANSFORM(obj, data)
+            
+            containedOnlyNaN = false;
+            % check for NaN values
+            if obj.containsNaN(data)
+                if obj.removeNaN 
+                    inds = isnan(data);
+                    data(inds) = [];
+                else
+                    if obj.containsOnlyNaN(data)
+                        % create a random matrix to test the transformations on output size for valid input
+                        containedOnlyNaN = true;
+                        data = rand(size(data));
+                    end
+                end
+            end
+            
             newData = [];
             if isvector(data)
                 newData = newData(:);
@@ -36,6 +52,9 @@ classdef FeatureExtractor < DataTransformer
             else
                 error(['unsupported input type ' class(data)])
             end
+            if containedOnlyNaN
+                newData = NaN(size(newData));
+            end
 %             if ismatrix(data)                
 %                 for t = 1 : length(obj.transformations)
 %                     trafo = obj.transformations(t);
@@ -50,6 +69,23 @@ classdef FeatureExtractor < DataTransformer
 %                 error('oops')
 %             end
         end
-    end      
+    end   
+    
+    %% Helper methods
+    methods (Access = private)
+        function bool = containsNaN(obj, data)
+            bool = false;
+            if sum(isnan(data)) > 1
+                bool = true;
+            end
+        end
+        
+        function bool = containsOnlyNaN(obj, data)
+            bool = false;
+            if sum(isnan(data) == true) == length(data)
+                bool = true;
+            end            
+        end
+    end
 end
 
