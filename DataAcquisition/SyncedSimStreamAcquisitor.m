@@ -107,6 +107,12 @@ classdef SyncedSimStreamAcquisitor < DataAcquisitor
             % than the sampled data time
             while deltaUtcTime < 0
                 iter = iter + 1;
+                if iter > length(logUtcTimes)
+                    % quit if no end position is found
+                    newData = NaN(2, length(obj.dataColumnNames) + 1);
+                    warning('could not find start position in log files');
+                    return;
+                end
                 deltaUtcTime = logUtcTimes(iter) - t(1);
             end
             iter = iter - 1;
@@ -120,6 +126,12 @@ classdef SyncedSimStreamAcquisitor < DataAcquisitor
             deltaUtcTime = -100;
             while deltaUtcTime < 0
                 iter = iter + 1;
+                if iter > length(logUtcTimes)
+                    % quit if no end position is found
+                    newData = NaN(2, length(obj.dataColumnNames) + 1);
+                    warning('could not find end position in log files');
+                    return;
+                end
                 deltaUtcTime = logUtcTimes(iter) - t(end);
             end
             iter = iter -1;
