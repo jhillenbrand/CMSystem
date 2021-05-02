@@ -10,7 +10,8 @@ classdef SimStreamAcquisitor < DataAcquisitor
         bufferSize = 0;
         stepSize = 0;
         dataStream = [];
-        plotFileFieldInds = [];        
+        plotFileFieldInds = [];
+        verbose = true;
     end
     
     properties (Access = private)
@@ -19,14 +20,19 @@ classdef SimStreamAcquisitor < DataAcquisitor
     end
     
     methods
-        function obj = SimStreamAcquisitor(dataParserObj, files, bufferSize, stepSize)
+        function obj = SimStreamAcquisitor(dataParserObj, files, bufferSize, stepSize, verbose)
             obj@DataAcquisitor(0, true);
             if nargin > 0
                 obj.files = files;
                 obj.bufferSize = bufferSize;
                 obj.stepSize = stepSize;
             end
+            if nargin < 5
+                verbose = true;
+            end
+            obj.verbose = verbose;
             obj.dataStream = SimulateDataStream_v2(dataParserObj, obj.files, obj.bufferSize, obj.stepSize);
+            obj.dataStream.verbose = obj.verbose;
         end
         
         function newData = requestAvailableData(obj)
