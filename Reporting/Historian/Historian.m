@@ -28,5 +28,13 @@ classdef Historian < Reporter
             end
         end
     end
+    
+    %% Helper Methods
+    methods 
+        function bytes = getBufferSizeInBytes(obj)
+            buf = obj.dataBuffer;
+            bytes = whos('buf').bytes;           
+        end
+    end
 end
 
