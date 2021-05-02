@@ -75,7 +75,7 @@ classdef DefaultFeatureExtractor < FeatureExtractor
                 obj.addTransformation(transformation);
             end                        
             if obj.transformToPeak2Peak
-                transformation = FeatureTransformation('PEAK2PEAK', @SignalAnalysis.peak2Peak);
+                transformation = FeatureTransformation('PEAK2PEAK', @SignalAnalysis.peakToPeak);
                 obj.addTransformation(transformation);
             end 
             if obj.transformToImpulseFactor
