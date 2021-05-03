@@ -4,6 +4,7 @@ classdef DefaultFeatureExtractor < FeatureExtractor
     %% properties
     properties
         sampleRate = 0;
+        windowSize = 0;
         
         % activate features
         transformToRMS = false;
@@ -20,6 +21,7 @@ classdef DefaultFeatureExtractor < FeatureExtractor
         transformToFormFactor = false;
         transformToMarginFactor = false;
         transformToEnergy = false;
+        transformToEnvelopeEnergy = false;
         transformToBinnedEntropy = false;
         transformToSkewness = false;
         transformToMeanFrequency = false;
@@ -100,6 +102,10 @@ classdef DefaultFeatureExtractor < FeatureExtractor
             end
             if obj.transformToEnergy
                 transformation = FeatureTransformation('ENERGY', @SignalAnalysis.getEnergy);
+                obj.addTransformation(transformation);
+            end
+            if obj.transformToEnvelopeEnergy
+                transformation = FeatureTransformation('ENV-ENERGY', @(x)SignalAnalysis.getEnvelopeEnergy(x, obj.windowSize, true));
                 obj.addTransformation(transformation);
             end
             if obj.transformToBinnedEntropy
