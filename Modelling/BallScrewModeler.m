@@ -34,11 +34,11 @@ classdef BallScrewModeler < Modeler
                     obj.ballscrew.EndTimeStamp = ts;
                 end
             
-                newData = [ts, obj.ballscrew.L_10, obj.ballscrew.Revolutions / obj.ballscrew.L_10 * 100];
+                newData = [ts, obj.ballscrew.F_m, obj.ballscrew.n_m, obj.ballscrew.Revolutions / obj.ballscrew.L_10 * 100];
             elseif isvector(ts)
                 obj.ballscrew.updateLifeCycleInformation(ts, fa, sp);
                 
-                newData = [mean(ts), obj.ballscrew.L_10, obj.ballscrew.Revolutions / obj.ballscrew.L_10 * 100];
+                newData = [mean(ts), obj.ballscrew.F_m, obj.ballscrew.n_m, obj.ballscrew.Revolutions / obj.ballscrew.L_10 * 100];
             end
         end
     end
