@@ -32,13 +32,17 @@ classdef DefaultFeatureExtractor < FeatureExtractor
     %% Class Methods
     methods
         %% - DefaultFeatureExtractor
-        function obj = DefaultFeatureExtractor(sampleRate)
+        function obj = DefaultFeatureExtractor(sampleRate, windowSize)
             %DEFAULTFEATUREEXTRACTOR(sampleRate)
             obj.name = [class(DefaultFeatureExtractor.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'];
+            if nargin < 2
+                windowSize = 0;
+            end
             if nargin < 1
                 sampleRate = 0;
             end
             obj.sampleRate = sampleRate;
+            obj.windowSize = windowSize;
             obj.initFeatureTransformations();
         end
         
