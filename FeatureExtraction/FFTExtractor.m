@@ -14,22 +14,16 @@ classdef FFTExtractor < FeatureExtractor
         function obj = FFTExtractor(sampleRate)
             obj@FeatureExtractor();
             obj.sampleRate = sampleRate;
-            
-            funcHandle = @(x) SignalAnalysis.fftPowerSpectrum(x, obj.sampleRate);
-            obj.transformations = Transformation('FFT-Trafo', funcHandle);
         end
     end
     
     %% Interface Methods
     methods
         function newData = transform(data)
-            
-            trafo = obj.transformations(1);
-            if isvector(data)
-                [f, p, t] = trafo.apply(data);            
+            if isvector(data)                       
                 newData = [f, p];
             elseif ismatrix(data)
-                [f, p, t] = trafo.apply(data);            
+                [f, p, t] = SignalAnalysis.fftPowerSpectrum(data, obj.sampleRate);       
                 newData = [f(:, 1), p];
             else
                 error(['unsupported input type ' class(data) ' of data'])
