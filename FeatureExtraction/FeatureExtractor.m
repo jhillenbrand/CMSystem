@@ -72,7 +72,7 @@ classdef FeatureExtractor < DataTransformer
     end   
     
     %% Helper methods
-    methods (Access = private)
+    methods (Access = protected)
         function bool = containsNaN(obj, data)
             bool = false;
             if sum(isnan(data)) > 1
