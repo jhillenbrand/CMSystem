@@ -22,7 +22,7 @@ classdef FFTExtractor < FeatureExtractor
     
     %% Interface Methods
     methods
-        function newData = transform(data)
+        function newData = transform(obj, data)
             
             trafo = obj.transformations(1);
             if isvector(data)
