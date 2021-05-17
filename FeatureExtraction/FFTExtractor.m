@@ -21,7 +21,8 @@ classdef FFTExtractor < FeatureExtractor
     methods
         function newData = transform(obj, data)
             
-            if isvector(data)                     
+            if isvector(data)     
+                [f, p, t] = SignalAnalysis.fftPowerSpectrum(data, obj.sampleRate);  
                 newData = [f, p];
             elseif ismatrix(data)
                 [f, p, t] = SignalAnalysis.fftPowerSpectrum(data, obj.sampleRate);       
