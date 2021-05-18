@@ -22,8 +22,10 @@ classdef TimePlotter < Plotter
     %% Interface Methods
     methods
         function report(obj, data)
-            if isnumeric(data)
+            if isvector(data)
                 P.timePlot(data, obj.sampleRate);
+            elseif ismatrix(data)
+                plot(data(:, 1), data(:, 2))
             else
                 whos(data)
                 error('dimension or type of is are not supported for plotting');
