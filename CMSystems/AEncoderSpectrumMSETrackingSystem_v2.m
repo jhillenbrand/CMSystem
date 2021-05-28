@@ -9,6 +9,7 @@ classdef AEncoderSpectrumMSETrackingSystem_v2 < CMSystem
         timeAppender = TimeAppender.empty;
         clusteringModel = SimpleClusterBoundaryModeler.empty;
         trackingModel = ClusterTrackingModeler.empty;
+        simStreamFilePlotter = SimStreamFilePlotter.empty;
         rawAEPlotter = MovingWindowPlotter.empty;
         clusterPlotter = SimpleClusterPlotter.empty;
         transitionPlotter = ClusterTransitionPlotter.empty;
@@ -27,6 +28,7 @@ classdef AEncoderSpectrumMSETrackingSystem_v2 < CMSystem
         bitPrecision = 12;
         lowPassFrequency = 250e3;
         downsampleFactor = 4;
+        fileFieldInds = [4, 5];
     end
     
     methods
@@ -44,7 +46,6 @@ classdef AEncoderSpectrumMSETrackingSystem_v2 < CMSystem
             dp = DataParser('FileType', obj.AE_FILE_TYPE);
             skipWindows = 10; 
             obj.aeDataAcquisitor = SimStreamAcquisitor(dp, aeFiles, obj.windowSize, skipWindows * obj.windowSize);
-            obj.aeDataAcquisitor.plotFileFieldInds = [4, 5];
             
             % Step 2 - Preprocessing Setup
             obj.preprocessor = AEPreprocessor('AE_PREPROCESSOR', obj.sampleRate, obj.lowPassFrequency, obj.downsampleFactor, obj.bitPrecision);
@@ -80,6 +81,8 @@ classdef AEncoderSpectrumMSETrackingSystem_v2 < CMSystem
             obj.clusteringModel.addObserver(obj.trackingModel);
             
             % Step 6 - Reporting
+            obj.simStreamFilePlotter = SimStreamFilePlotter(obj.aeDataAcquisitor, obj.fileFieldInds);
+            
             obj.rawAEPlotter = MovingWindowPlotter(false, 5 * obj.sampleRate);
             
             obj.clusterPlotter = SimpleClusterPlotter();
@@ -88,6 +91,7 @@ classdef AEncoderSpectrumMSETrackingSystem_v2 < CMSystem
             
             obj.anomalyStatePlotter = AnomalyAndStateTracker();
             
+            obj.aeDataAcquisitor.addObserver(obj.simStreamFilePlotter);
             obj.preprocessor.addObserver(obj.rawAEPlotter);
             obj.clusteringModel.addObserver(obj.clusterPlotter);
             obj.trackingModel.addObserver(obj.transitionPlotter);

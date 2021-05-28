@@ -6,8 +6,7 @@ classdef CMSystem < CMSystemInterface
     %CMSYSTEM
     
     %% properties
-    properties
-        L = JLog(); 
+    properties 
         name = '';
         transformers = [];
         strategies = {};
@@ -41,7 +40,7 @@ classdef CMSystem < CMSystemInterface
             if class(Transformer()) == class(transformer)                
                 obj.transformers = [obj.transformers; transformer];
             else
-                obj.L.log('ERROR', ['transformer must be of type ' class(Transformer())]);
+                error(['transformer must be of type ' class(Transformer())]);
             end
         end
         
@@ -50,7 +49,7 @@ classdef CMSystem < CMSystemInterface
             if ~isempty(strategy)
                 obj.activeStrategy = strategy;
             else
-                obj.L.log('ERROR', ['strategy ' strategyName ' does not exist.']);
+                error(['strategy ' strategyName ' does not exist.']);
             end
         end
         
