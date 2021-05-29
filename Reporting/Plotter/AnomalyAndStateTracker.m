@@ -147,14 +147,23 @@ classdef AnomalyAndStateTracker < Plotter
                         obj.currentLogEntry = [obj.currentLogEntry ', state withdrawn'];
                     end
                 end
-                
-                % survive transition --> stable state
-                if uniqueTransitions(t).type == TransitionType.SurviveTransition
+                % cluster merge --> -state
+                if uniqueTransitions(t).type == TransitionType.MergeTransition
+                    obj.stateCount = obj.stateCount - 1;
                     obj.currentState = uniqueTransitions(t).clusterIndex;
                     if strcmp(obj.currentLogEntry, '')
-                        obj.currentLogEntry = 'within stable state';
+                        obj.currentLogEntry = 'state withdrawn';
                     else
-                        obj.currentLogEntry = [obj.currentLogEntry ', within stable state'];
+                        obj.currentLogEntry = [obj.currentLogEntry ', state withdrawn'];
+                    end
+                end                
+                % repeating old cluster transition --> -state
+                if uniqueTransitions(t).type == TransitionType.ConsumeOldStateTransition
+                    obj.currentState = uniqueTransitions(t).clusterIndex;
+                    if strcmp(obj.currentLogEntry, '')
+                        obj.currentLogEntry = 'state withdrawn (it already exists)';
+                    else
+                        obj.currentLogEntry = [obj.currentLogEntry ', state withdrawn (it already exists)'];
                     end
                 end
                 
