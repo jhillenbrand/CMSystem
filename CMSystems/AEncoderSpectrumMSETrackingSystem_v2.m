@@ -14,6 +14,7 @@ classdef AEncoderSpectrumMSETrackingSystem_v2 < CMSystem
         clusterPlotter = SimpleClusterPlotter.empty;
         transitionPlotter = ClusterTransitionPlotter.empty;
         anomalyStatePlotter = AnomalyAndStateTracker.empty;
+        timeLinePlotter = ClusterTrackingTimeline.empty;
     end
         
     %% config settings
@@ -91,11 +92,14 @@ classdef AEncoderSpectrumMSETrackingSystem_v2 < CMSystem
             
             obj.anomalyStatePlotter = AnomalyAndStateTracker();
             
+            obj.timeLinePlotter = ClusterTrackingTimeline();
+            
             obj.aeDataAcquisitor.addObserver(obj.simStreamFilePlotter);
             obj.preprocessor.addObserver(obj.rawAEPlotter);
             obj.clusteringModel.addObserver(obj.clusterPlotter);
             obj.trackingModel.addObserver(obj.transitionPlotter);
             obj.trackingModel.addObserver(obj.anomalyStatePlotter);
+            obj.trackingModel.addObserver(obj.timeLinePlotter);
         end        
     end
     

@@ -3,6 +3,7 @@ classdef ClusterTrackingModeler < Modeler
     
     properties
         clusterTracker = ClusterTracking.empty;
+        transitionHistory = [];                    
     end
     
     properties
@@ -24,6 +25,7 @@ classdef ClusterTrackingModeler < Modeler
             newData = [];
             if ~isempty(data)
                 if isa(data, class(SimpleBoundaryClusterer.empty))
+                    obj.transitionHistory = [obj.transitionHistory; data];                    
                     % get last two clusterStates
                     if length(data.clusterStates) > 2
                         cs_i = data.clusterStates(end - 1);

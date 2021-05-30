@@ -32,44 +32,56 @@ classdef AnomalyAndStateTracker < Plotter
             newData = [];
             if ~isempty(data)
                 if isa(data, class(ClusterTransition.empty))
-                    obj.transitionHistory = [obj.transitionHistory; data];
                     obj.processTransitions(data);
-                    c = categorical({'Anomalies','States'});
-                    c = reordercats(c,{'Anomalies','States'});
+                    names = {'States', 'Anomalies'};
                     subplot(1, 3, 1)
-                        counts = [obj.anomalyCount, obj.stateCount];
-                        b = bar(c, counts);                    
-                        b.FaceColor = P.darkgreen();
-                        b.CData(1, :) = P.red();                                        
+                        counts = [obj.stateCount, obj.anomalyCount];
+                        b = bar(1, counts(1));
+                        b.FaceColor = P.darkgreen();                   
                         xtips1 = b.XEndPoints;
                         ytips1 = b.YEndPoints;
                         labels1 = string(b.YData);
-                        text(xtips1, ytips1, labels1, 'HorizontalAlignment','center', 'VerticalAlignment','bottom')
+                        text(xtips1, ytips1, labels1, 'HorizontalAlignment','center', 'VerticalAlignment','bottom')                                                
+                        hold on
+                        b = bar(2, counts(2));
+                        b.FaceColor = P.red();
+                        xtips1 = b.XEndPoints;
+                        ytips1 = b.YEndPoints;
+                        labels1 = string(b.YData);
+                        text(xtips1, ytips1, labels1, 'HorizontalAlignment','center', 'VerticalAlignment','bottom')                                                
+                        set(gca, 'xtick', [1 : 2],'xticklabel',names)
                         m = max(counts);
                         ylim([0, m + 5])
-                        
-                    if ~strcmp(obj.lastLogEntry, obj.currentLogEntry)
-                        if length(obj.eventLog) >= obj.maxLogEntries
-                            obj.eventLog = obj.eventLog(2:end);
-                            obj.eventLog{end + 1} = [datestr(now) ' --> ' obj.currentLogEntry newline];
-                        else 
-                            obj.eventLog{end + 1} = [datestr(now) ' --> ' obj.currentLogEntry newline];
+                        hold off
+                    if ~isempty(obj.currentLogEntry)                                  
+                        if ~strcmp(obj.lastLogEntry, obj.currentLogEntry)
+                            if length(obj.eventLog) >= obj.maxLogEntries
+                                obj.eventLog = obj.eventLog(2:end);
+                                obj.eventLog{end + 1} = [datestr(now) ' --> ' obj.currentLogEntry newline];
+                            else 
+                                obj.eventLog{end + 1} = [datestr(now) ' --> ' obj.currentLogEntry newline];
+                            end
+                        else
+                            if isempty(obj.eventLog)
+                                obj.eventLog{1} = [datestr(now) ' --> ' obj.currentLogEntry newline];
+                            else
+                                obj.eventLog{end} = [datestr(now) ' --> ' obj.currentLogEntry newline];
+                            end
                         end
-                    else
-                        obj.eventLog{end} = [datestr(now) ' --> ' obj.currentLogEntry newline];
-                    end
-                    et1 = ['current state: ' num2str(obj.currentState)];                    
-                    et2 = ['Log: ' newline obj.eventLog];
-                    
-                    subplot(1, 3, 2:3)
-                        plot(0,0)
-                        xlim([0, 20])
-                        ylim([0, 20])
-                        text(1, 19, et1);
-                        text(1, 8, et2);
-                        P.removeAxisTicks(false)
-                        set(gca,'Color',P.gold())
-                                                
+                        if ~isempty(obj.eventLog)
+                            et1 = ['current state: ' num2str(obj.currentState)];                    
+                            et2 = ['Log: ' newline obj.eventLog];
+
+                            subplot(1, 3, 2:3)
+                                plot(0,0)
+                                xlim([0, 20])
+                                ylim([0, 20])
+                                text(1, 19, et1);
+                                text(1, 8, et2);
+                                P.removeAxisTicks(false)
+                                set(gca,'Color',P.gold())
+                        end
+                    end                        
                     obj.lastLogEntry = obj.currentLogEntry;
                 else
                     error(['data is not of type ' class(ClusterTransition.empty)])
@@ -92,7 +104,7 @@ classdef AnomalyAndStateTracker < Plotter
                     if strcmp(obj.currentLogEntry, '')
                         obj.currentLogEntry = 'new anomaly detected';
                     else
-                        obj.currentLogEntry = [obj.currentLogEntry ', ' 'new anomaly detected'];
+                        obj.currentLogEntry = [obj.currentLogEntry ',' newline 009 'new anomaly detected'];
                     end
                 end
                 
@@ -102,7 +114,7 @@ classdef AnomalyAndStateTracker < Plotter
                     if strcmp(obj.currentLogEntry, '')
                         obj.currentLogEntry = 'anomaly withdrawn';
                     else
-                        obj.currentLogEntry = [obj.currentLogEntry ', anomaly withdrawn'];
+                        obj.currentLogEntry = [obj.currentLogEntry ',' newline 009 'anomaly withdrawn'];
                     end
                 end
                 % outlier merge --> -anomaly
@@ -112,7 +124,17 @@ classdef AnomalyAndStateTracker < Plotter
                     if strcmp(obj.currentLogEntry, '')
                         obj.currentLogEntry = 'anomalies formed new state over time';
                     else
-                        obj.currentLogEntry = [obj.currentLogEntry ', anomalies formed new state over time'];
+                        obj.currentLogEntry = [obj.currentLogEntry ',' newline 009 'anomalies formed new state over time'];
+                    end
+                end
+                % outliers formed cluster --> -anomaly
+                if uniqueTransitions(t).type == TransitionType.OutlierToStateTransition
+                    obj.anomalyCount = obj.anomalyCount - 1;
+                    obj.currentState = uniqueTransitions(t).clusterIndex;
+                    if strcmp(obj.currentLogEntry, '')
+                        obj.currentLogEntry = 'anomalies belong to existing state';
+                    else
+                        obj.currentLogEntry = [obj.currentLogEntry ',' newline 009 'anomalies belong to existing state'];
                     end
                 end
                 
@@ -123,17 +145,7 @@ classdef AnomalyAndStateTracker < Plotter
                     if strcmp(obj.currentLogEntry, '')
                         obj.currentLogEntry = 'new state detected';
                     else
-                        obj.currentLogEntry = [obj.currentLogEntry ', new state detected'];
-                    end
-                end
-                % outliers formed cluster --> +state
-                if uniqueTransitions(t).type == TransitionType.OutlierToStateTransition
-                    obj.anomalyCount = obj.anomalyCount - 1;
-                    obj.currentState = uniqueTransitions(t).clusterIndex;
-                    if strcmp(obj.currentLogEntry, '')
-                        obj.currentLogEntry = 'anomalies belong to existing state';
-                    else
-                        obj.currentLogEntry = [obj.currentLogEntry ', anomalies belong to existing state'];
+                        obj.currentLogEntry = [obj.currentLogEntry ',' newline 009 'new state detected'];
                     end
                 end
                 
@@ -144,26 +156,16 @@ classdef AnomalyAndStateTracker < Plotter
                     if strcmp(obj.currentLogEntry, '')
                         obj.currentLogEntry = 'state withdrawn';
                     else
-                        obj.currentLogEntry = [obj.currentLogEntry ', state withdrawn'];
+                        obj.currentLogEntry = [obj.currentLogEntry ',' newline 009 'state withdrawn'];
                     end
-                end
-                % cluster merge --> -state
-                if uniqueTransitions(t).type == TransitionType.MergeTransition
-                    obj.stateCount = obj.stateCount - 1;
-                    obj.currentState = uniqueTransitions(t).clusterIndex;
-                    if strcmp(obj.currentLogEntry, '')
-                        obj.currentLogEntry = 'state withdrawn';
-                    else
-                        obj.currentLogEntry = [obj.currentLogEntry ', state withdrawn'];
-                    end
-                end                
+                end               
                 % repeating old cluster transition --> -state
                 if uniqueTransitions(t).type == TransitionType.ConsumeOldStateTransition
                     obj.currentState = uniqueTransitions(t).clusterIndex;
                     if strcmp(obj.currentLogEntry, '')
                         obj.currentLogEntry = 'state withdrawn (it already exists)';
                     else
-                        obj.currentLogEntry = [obj.currentLogEntry ', state withdrawn (it already exists)'];
+                        obj.currentLogEntry = [obj.currentLogEntry ',' newline 009 'state withdrawn (it already exists)'];
                     end
                 end
                 
@@ -173,7 +175,7 @@ classdef AnomalyAndStateTracker < Plotter
                     if strcmp(obj.currentLogEntry, '')
                         obj.currentLogEntry = 'return within stable state';
                     else
-                        obj.currentLogEntry = [obj.currentLogEntry ', return within stable state'];
+                        obj.currentLogEntry = [obj.currentLogEntry ',' newline 009 'return within stable state'];
                     end
                 end
                 

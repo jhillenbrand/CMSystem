@@ -29,6 +29,7 @@ classdef AEncoderSpectrumMSETrackingLearningStrategy_v2 < CMStrategy
             cmSystem.clusterPlotter.disable();
             cmSystem.transitionPlotter.disable();
             cmSystem.anomalyStatePlotter.disable();
+            cmSystem.timeLinePlotter.disable();
             % make preprocessor data before extractor persistent
             cmSystem.preprocessor.setDataPersistent(true);
             
@@ -64,6 +65,7 @@ classdef AEncoderSpectrumMSETrackingLearningStrategy_v2 < CMStrategy
             cmSystem.clusterPlotter.enable();
             cmSystem.transitionPlotter.enable();
             cmSystem.anomalyStatePlotter.enable();
+            cmSystem.timeLinePlotter.enable();
             %cmSystem.lowPassProcessor.setDataPersistent(false);
             out = true;
         end
