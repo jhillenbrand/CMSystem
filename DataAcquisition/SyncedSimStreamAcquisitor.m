@@ -52,7 +52,7 @@ classdef SyncedSimStreamAcquisitor < DataAcquisitor
             t = 0 : T : (bufferSize - 1) * T;
             t = t(:);
             utcTime = str2double(unix_timestamp_start);             
-            t = t * 1000+ utcTime + idxFile/sampleRate*1000;  % convert to absolute ms
+            t = t * 1000 + utcTime + idxFile/sampleRate*1000;  % convert to absolute ms
             
             % Step 3: Search for corresponding PLC logfiles depending on timestamp extracted from AE filename
             %         because the plc log files contain data over multiple minutes,
@@ -63,93 +63,107 @@ classdef SyncedSimStreamAcquisitor < DataAcquisitor
             utcTimes = DataParser.getUnixTimeStampsFromFilePaths(obj.log_files);
             % Check time stamps and calculate necessary csv files
             % plc time has to be smaller then ae time
-            startFileNum = 0;
-            endFileNum = 0;
-            for i = 1:size(utcTimes)
-                if t(1) > (utcTimes(i) - 1)
-                    startFileNum = i;
+
+            logFileInd = find(utcTimes > utcTime, 1, 'first');
+            if ~isempty(logFileInd) && logFileInd > 1
+            
+            % PREVIOUS CODE
+%             startFileNum = 0;
+%             endFileNum = 0;
+%             for i = 1:size(utcTimes)
+%                 if t(1) > (utcTimes(i) - 1)
+%                     startFileNum = i;
+%                 end
+%                 if t(end) > (utcTimes(i) - 1)
+%                     endFileNum = i;
+%                 end
+%             end
+%            csvFileNums = startFileNum : endFileNum;
+%            if csvFileNums(1) > 0
+%                foundFiles = obj.log_files(csvFileNums);
+
+                foundFiles = obj.log_files(logFileInd - 1);    
+
+                % load found log files
+                dp2 = DataParser();
+                dp2.readFiles(foundFiles);
+                % try to load plc time
+                try
+                    logUtcTimes = dp2.getDataColumnByName(obj.timeDataHeaderName);
+                catch
+                    disp('Time column name is not correct');
                 end
-                if t(end) > (utcTimes(i) - 1)
-                    endFileNum = i;
+                % load logging data
+                d_log_temp = zeros(length(logUtcTimes), length(obj.dataColumnNames));
+                try
+                    for i = 1 : length(obj.dataColumnNames)
+                        d_log_temp(:, i) = dp2.getDataColumnByName(obj.dataColumnNames{i});
+                    end
+                catch e
+                    disp(e.message)
+                    disp(['Column "' obj.dataColumnNames{i} '" does not exist']);
                 end
-            end
-            csvFileNums = startFileNum : endFileNum;
-            if csvFileNums(1) > 0
-            foundFiles = obj.log_files(csvFileNums);
+                % Step 4: find the data in plc log files that matches the same time
+                %         period as the sampled Data
 
-            % load found log files
-            dp2 = DataParser();
-            dp2.readFiles(foundFiles);
-            % try to load plc time
-            try
-                logUtcTimes = dp2.getDataColumnByName(obj.timeDataHeaderName);
-            catch
-                disp('Time column name is not correct');
-            end
-            % load logging data
-            d_log_temp = zeros(length(logUtcTimes), length(obj.dataColumnNames));
-            try
-                for i = 1 : length(obj.dataColumnNames)
-                    d_log_temp(:, i) = dp2.getDataColumnByName(obj.dataColumnNames{i});
-                end
-            catch e
-                disp(e.message)
-                disp(['Column "' obj.dataColumnNames{i} '" does not exist']);
-            end
-            % Step 4: find the data in plc log files that matches the same time
-            %         period as the sampled Data
+                indsLog = (logUtcTimes >= t(1) & logUtcTimes <= t(end));
+            
+%       PREVIOUS CODE           
+%             deltaUtcTime = -100;
+%             iter = 0;
+% 
+%             % Search for start position
+%             % the correct log time is a row before the log time which is greater
+%             % than the sampled data time
+%             while deltaUtcTime < 0
+%                 iter = iter + 1;
+%                 if iter > length(logUtcTimes)
+%                     % quit if no end position is found
+%                     newData = NaN(2, length(obj.dataColumnNames) + 1);
+%                     warning('could not find start position in log files');
+%                     return;
+%                 end
+%                 deltaUtcTime = logUtcTimes(iter) - t(1);
+%             end
+%             iter = iter - 1;
+%             % Check if plc time is found
+%             if iter == 0
+%                 warning('No matching csv file found');
+%             end
+%             startIter = iter;
+% 
+%             % Search for end position
+%             deltaUtcTime = -100;
+%             while deltaUtcTime < 0
+%                 iter = iter + 1;
+%                 if iter > length(logUtcTimes)
+%                     % quit if no end position is found
+%                     newData = NaN(2, length(obj.dataColumnNames) + 1);
+%                     warning('could not find end position in log files');
+%                     return;
+%                 end
+%                 deltaUtcTime = logUtcTimes(iter) - t(end);
+%             end
+%             iter = iter -1;
+% 
+%                 % Step 5: create the log output variables
+% 
+%                 % return plc Time and plc Data
+%                 t_log = zeros([iter - startIter + 1, 1]);
+%                 d_log = zeros([iter - startIter + 1, length(obj.dataColumnNames)]);
+%                 if iter>0
+%                 for i = startIter:iter
+%                     t_log(i - startIter + 1) = logUtcTimes(i);
+%                     for j = 1: length(obj.dataColumnNames)
+%                         d_log(i - startIter + 1 , j) = d_log_temp(i, j);
+%                     end
+%                 end
 
-            deltaUtcTime = -100;
-            iter = 0;
-
-            % Search for start position
-            % the correct log time is a row before the log time which is greater
-            % than the sampled data time
-            while deltaUtcTime < 0
-                iter = iter + 1;
-                if iter > length(logUtcTimes)
-                    % quit if no end position is found
-                    newData = NaN(2, length(obj.dataColumnNames) + 1);
-                    warning('could not find start position in log files');
-                    return;
-                end
-                deltaUtcTime = logUtcTimes(iter) - t(1);
-            end
-            iter = iter - 1;
-            % Check if plc time is found
-            if iter == 0
-                warning('No matching csv file found');
-            end
-            startIter = iter;
-
-            % Search for end position
-            deltaUtcTime = -100;
-            while deltaUtcTime < 0
-                iter = iter + 1;
-                if iter > length(logUtcTimes)
-                    % quit if no end position is found
-                    newData = NaN(2, length(obj.dataColumnNames) + 1);
-                    warning('could not find end position in log files');
-                    return;
-                end
-                deltaUtcTime = logUtcTimes(iter) - t(end);
-            end
-            iter = iter -1;
-
-            % Step 5: create the log output variables
-
-            % return plc Time and plc Data
-            t_log = zeros([iter - startIter + 1, 1]);
-            d_log = zeros([iter - startIter + 1, length(obj.dataColumnNames)]);
-            if iter>0
-            for i = startIter:iter
-                t_log(i - startIter + 1) = logUtcTimes(i);
-                for j = 1: length(obj.dataColumnNames)
-                    d_log(i - startIter + 1 , j) = d_log_temp(i, j);
-                end
-            end
-            end
-
+                % Step 5: create the log output variables
+                
+                t_log = logUtcTimes(indsLog);
+                d_log = d_log_temp(indsLog, :);
+                
             else
                 warning('No matching csv file found')
                 t_log = [];
