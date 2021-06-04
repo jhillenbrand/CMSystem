@@ -11,7 +11,7 @@ if isempty(files)
 end
 %%
 AE_MAT_FOLDER = 'U:\18_071_DFG_AE_KGT\4_Arbeitsinhalte\4_1_Measurements\5-Achser-KGT-Measurements\20210118_mess_ae_kgt_cam\Verschleissfahrt3\';
-AE_MAT_FOLDER = 'C:\Users\Jan\OneDrive - student.kit.edu\Uni\HIWI\SyncedStreamAcquisitor\AE';
+%AE_MAT_FOLDER = 'C:\Users\Jan\OneDrive - student.kit.edu\Uni\HIWI\SyncedStreamAcquisitor\AE';
 LOG_CSV_FOLDER = 'C:\Users\Jan\OneDrive - student.kit.edu\Uni\HIWI\SyncedStreamAcquisitor\PLC';
 
 files = DataParser.getFilePaths(AE_MAT_FOLDER, 'mat', 'ORLL', true);

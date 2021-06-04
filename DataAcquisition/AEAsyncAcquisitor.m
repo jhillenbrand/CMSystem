@@ -11,13 +11,12 @@ classdef AEAsyncAcquisitor < DataAcquisitor
     end
     
     methods
-        function AEAsyncAcquisitor()
-            
+        function obj = AEAsyncAcquisitor()            
             obj.dataParser = DataParser('FileType', 'bin');            
-            dp.BitFormat = 'int16';
-            dp.bigEndian = true; 
+            obj.dataParser.BitFormat = 'int16';
+            obj.dataParser.bigEndian = true; 
         end
-    
+    end
     methods 
         
         function newData = requestAvailableData(obj)

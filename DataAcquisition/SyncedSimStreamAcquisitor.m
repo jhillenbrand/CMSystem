@@ -13,6 +13,7 @@ classdef SyncedSimStreamAcquisitor < DataAcquisitor
         log_files = [];
         dataColumnNames = [];
         timeDataHeaderName = [];
+        timePadding = 0;   % [ms] can be used to extract additional time window in front and after the found time window
     end
         
     methods
@@ -41,7 +42,7 @@ classdef SyncedSimStreamAcquisitor < DataAcquisitor
             % differentiate between fileAtOnce DataStream and
             %   buffered/windowed data stream            
             if obj.SimStreamAcq.dataStream.fileAtOnce
-                bufferSize = size(obj.SimStreamAcq.dataStream.dataBuffer, 1);
+                bufferSize = size(obj.SimStreamAcq.dataStream.dataParserObj.Data, 1);
             else
                 bufferSize = obj.SimStreamAcq.dataStream.bufferSize;
             end
@@ -105,8 +106,10 @@ classdef SyncedSimStreamAcquisitor < DataAcquisitor
                 end
                 % Step 4: find the data in plc log files that matches the same time
                 %         period as the sampled Data
-
-                indsLog = (logUtcTimes >= t(1) & logUtcTimes <= t(end));
+                
+                % check if extra time padding is requested
+                indsLog = (logUtcTimes >= t(1) - obj.timePadding & logUtcTimes <= t(end) + obj.timePadding);
+                
             
 %       PREVIOUS CODE           
 %             deltaUtcTime = -100;
