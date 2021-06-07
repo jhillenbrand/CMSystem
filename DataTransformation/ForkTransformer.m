@@ -26,7 +26,17 @@ classdef ForkTransformer < DataTransformer
     %% Static Methods
     methods (Static)
         function newData = fork(data, dataColumns)
-            newData = data(:, dataColumns);
+            if iscell(data)
+                disp('cell implementation missing')
+            elseif ismatrix(data)
+                newData = data(:, dataColumns);
+            else
+                if sum(dataColumns > size(data, 2)) > 0
+                    error('not enough data columns')
+                else
+                    newData = data(:, dataColumns);
+                end
+            end
         end
     end
 end
