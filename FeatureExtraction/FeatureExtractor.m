@@ -9,6 +9,12 @@ classdef FeatureExtractor < DataTransformer
         removeNaN = false;
     end
     
+    methods 
+        function obj = FeatureExtractor(name, transformation)
+            obj@DataTransformer(name, transformation);
+        end
+    end
+    
     methods
         %% - transform
         function newData = transform(obj, data)
