@@ -11,7 +11,7 @@ classdef BallScrewModeler < Modeler
         
         % modes (1 = lifetime, 2 = frequency)
         mode = 1;
-        periodOutput = true;
+        periodOutput = false;
     end
     
     methods

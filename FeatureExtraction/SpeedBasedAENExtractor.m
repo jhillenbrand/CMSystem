@@ -6,8 +6,9 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
     %SpeedBasedAENExtractor 
     
     properties
-        speeds = [];
+        spindleSpeeds = [];
         aens = [];
+        activeAEN = []; % matrix [n x m], where n are the number of speeds detected so far and m the number of scenarios / time windows for segmentation
         peakFinder = [];
         sampleRate = 2e6;   % sample rate of data to be processed [Hz]
     end
@@ -32,24 +33,25 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
         end
         
         function setAutoencoder(obj, autoencoder)
-            obj.autoencoder = autoencoder;
+            obj.activeAEN = autoencoder;
         end
                                 
         %% - predictMSE
-        function newData = predictMSE(obj, speed, aeData)
-            %PREDICTMSE predicts the reconstruction for data, based on required autoencoder specified by speed 
-            
-            % aeData is a f x w matrix, where f is the number of features
+        function newData = predictMSE(obj, aeData)
+            %PREDICTMSE predicts the reconstruction for data, based on activated autoencoder
+            % obj: instance of class
+            % aeData: a f x w matrix, where f is the number of features
             %   (here each raw sample is considered a feature) and w is the
             %   number of windows
             %   or
             %   aeData is a f x 1 vector
             
-            % convert to spectrum if required
-            if obj.useSpectrum
-               [f, p] = SignalAnalysis.fftPowerSpectrum(aeData, obj.sampleRate);
-               aeData = p;
-            end
+           
+            % convert aeData to spectrum windows 
+            [f, p] = SignalAnalysis.fftPowerSpectrum(aeData, obj.sampleRate);
+            aeData = p;
+            
+            
             data_Pred = obj.autoencoder.predict(aeData);
             newData = mean(SignalAnalysis.getMSE(aeData, data_Pred, 2));
         end
@@ -60,12 +62,46 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
         %% - learn
         function learn(obj, data)
             %LEARN implements the LearnableInterface Method
+            
+            
+            
+            
             obj.defaultLearn(data);
         end
         
         %% - transform
         function newData = transform(obj, data)
-            newData = obj.predictMSE(data);
+            if iscell(data)
+                
+                freqs = data{1};
+                aeData = data{2};
+                
+                 % check if autoencoder for speed exists already!
+                isTrained = obj.spindleSpeeds == freqs(1);
+                trainedAENs = obj.aens(isTrained, :);
+                if isempty(trainedAENs)
+                    obj.learn([speed, aeData])
+                end
+
+                sf = [freqs(2), freqs(4),  freqs(5)];
+                if length(sf) ~= length(trainedAENs)
+                    error('frequencies for segmenting does not match number of autoencoders')
+                end
+                % iterate through all trainedAENs for this spindleSpeed
+                for a = 1 : length(trainedAENs)
+                    obj.activeAEN = trainedAENs(a);
+
+                    % separate raw data into windows for each frequency scenario
+                    
+                    % predict mse
+
+                end
+
+                newData = obj.predictMSE(speed, aeData);
+            else
+                newData = [];
+                warning(['data [' class(data) '] was not of type cell'])
+            end
         end
     end
     
@@ -75,7 +111,7 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
             obj.setDefaultPeakFinder();
             obj.setDefaultAutoencoder();
             obj.setDefaultLearnOptions();
-            obj.autoencoder.train(data);
+            obj.activeAEN.train(data);
         end
             
         function setDefaultPeakFinder(obj)
@@ -89,7 +125,7 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
         
         function setDefaultAutoencoder(obj)
             %obj.autoencoder = MyDeepAutoencoder(6, 1);
-            obj.autoencoder = MyShallowAutoencoder(6);
+            obj.activeAEN = MyShallowAutoencoder(6);
             obj.setDefaultLearnOptions();
         end
         
