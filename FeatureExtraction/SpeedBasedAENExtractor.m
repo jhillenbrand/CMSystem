@@ -7,37 +7,36 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
     
     properties
         spindleSpeeds = [];
+        speedTol = 2;   % new spindle speed must fall within +/- speedTol, to be considered same speed
         segmentationFreqs = [2; 4; 5];
-        learningData = [];
-        aens = [];
-        activeAEN = []; % matrix [n x m], where n are the number of speeds detected so far and m the number of scenarios / time windows for segmentation
+        segmentationSamples = [];   % variable to store the segmentation windows, also used for autoencoder feature input layer size
+        learningData = {};
+        aens = {};
         peakFinder = [];
         sampleRate = 2e6;   % sample rate of data to be processed [Hz]
         f_res = 100;
         minLearningWindows = 10;   % minimum number of data windows required for learning of new autoencoder
+        mseMean = false;
     end
     
     methods
-        function obj = AutoEncoderExtractor(sampleRate)
+        function obj = SpeedBasedAENExtractor(sampleRate, f_res, minLearningWindows)
+            obj@FeatureExtractor('Speed_AEN_Ex1', []);
             if nargin < 1
                 sampleRate = 2e6;
             end
+            if nargin < 2
+                f_res = 100;
+            end
+            if nargin < 3
+                minLearningWindows = 10;
+            end
             obj.sampleRate = sampleRate;
+            obj.f_res = f_res;
+            obj.minLearningWindows = minLearningWindows;
             funcHandle = @(x)obj.predictMSE(x);
             transformation = Transformation(['Autoencoder MSE ' class(Transformation.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'], funcHandle);
-            obj.addTransformation(transformation);
-            
-            % init autoencoder and peakfinder
-            obj.setDefaultPeakFinder();
-            obj.setDefaultAutoencoder();
-        end
-           
-        function setPeakFinder(obj, peakFinder)
-            obj.peakFinder = peakFinder;
-        end
-        
-        function setAutoencoder(obj, autoencoder)
-            obj.activeAEN = autoencoder;
+            obj.addTransformation(transformation);   
         end
                                 
         %% - predictMSE
@@ -50,12 +49,19 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
             %   or
             %   aeData is a f x 1 vector            
            
-            % convert aeData to spectrum windows 
-            [f, p] = SignalAnalysis.fftPowerSpectrum(aeData, obj.sampleRate);
-            aeData = p;            
-            
-            data_Pred = aen.predict(aeData);
-            newData = mean(SignalAnalysis.getMSE(aeData, data_Pred, 2));
+            % convert aeData to spectrum windows
+            if isempty(aeData)
+                newData = [];
+            else                
+                [f, p] = SignalAnalysis.fftPowerSpectrum(aeData, obj.sampleRate);
+                data_Pred = aen.predict(p);
+                if obj.mseMean
+                    mse = mean(SignalAnalysis.getMSE(p, data_Pred, 1));
+                else                    
+                    mse = SignalAnalysis.getMSE(p, data_Pred, 1);
+                end
+                newData = mse(:);
+            end
         end
     end
     
@@ -65,23 +71,31 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
         function learn(obj, data)
             %LEARN implements the LearnableInterface Method
             
-            freqs = data(1); % frequencies
+            freqs = data{1}; % frequencies
             spindleSpeed = freqs(1);
-            aeData = data(2);            
+            aeData = data{2}; % AE Data           
            
-            obj.spindleSpeeds = [obj.spindleSpeeds; spindleSpeed]; 
-            speedInd = (obj.spindleSpeeds == spindleSpeed);
+            % check if spindle speeds already exists
+            speedInd = obj.checkIfSpindleSpeedExists(spindleSpeed);
             
             % store learning data
-            obj.learningData{speedInd, 1} = [obj.learningData{speedInd, 1}; aeData];
+            if isempty(obj.learningData)
+                obj.learningData{speedInd, 1} = aeData;
+            else
+                if size(obj.learningData, 1) < speedInd
+                    obj.learningData{speedInd, 1} = aeData;
+                else
+                    obj.learningData{speedInd, 1} = [obj.learningData{speedInd, 1}; aeData];
+                   end
+            end 
             
             % check if dataBuffer contains enough data for learning for specific segmentation window                
             sf = freqs(obj.segmentationFreqs);    % segmentation frequencies
             enoughForTraining = false;
             for s = 1 : length(sf)
-                segT = 1 / sf(s);
-                learnN = obj.sampleRate * segT * obj.minLearningWindows;
-                if length(obj.learningData{speedInd, 1}) <= learnN
+                segN = 1 / sf(s);
+                learnN = obj.sampleRate * segN * obj.minLearningWindows;
+                if length(obj.learningData{speedInd, 1}) >= learnN
                     enoughForTraining = true;
                 else
                     enoughForTraining = false;
@@ -91,57 +105,97 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
             
             if enoughForTraining
                 for s = 1 : length(sf)
-                    segT = floor(1 / sf(s) * obj.sampleRate);
+                    segN = floor(1 / sf(s) * obj.sampleRate);
                     ld = obj.learningData{speedInd, 1};
                     % determine hidden layer 
-                    dw = SignalAnalysis.separateDataIntoWindows(ld, segT, true);
+                    dw = SignalAnalysis.separateDataIntoWindows(ld, segN, true);
                     [f, p, t] = SignalAnalysis.fftPowerSpectrum(dw, obj.sampleRate);
                     pMean = mean(p, 2);
                     [locs, peaks, numOfPeaks] = PeakFinder.peaksByKneePointSearch(f, pMean, obj.f_res, false, 2);
                     % init autoencoder
                     aen = obj.createDefaultAEN();
                     aen.setHiddenWidth(numOfPeaks);
-                    % train autoencoder
-                    aen.train(dw);
-                    obj.aens(speedInd, s) = aen;
+                    % train autoencoder with spectrum
+                    disp(['INFO: train autoencoder for speed = ' num2str(spindleSpeed) ', segment = ' num2str(segN)])
+                    aen.train(p);
+                    obj.aens{speedInd, s} = aen;
+                    obj.segmentationSamples(speedInd, s) = segN;
                 end
+                % delete learningData for corresponding speed
+                obj.learningData{speedInd, 1} = [];
             end
         end
         
         %% - transform
         function newData = transform(obj, data)
             if iscell(data)
-                
-                freqs = data{1};
-                spindleSpeed = freqs(1);
-                aeData = data{2};
-                
-                % check if autoencoder for speed exists already!
-                isTrained = (obj.spindleSpeeds == spindleSpeed);
-                if length(isTrained) > size(obj.aens, 1)
-                    trainedAENs = obj.aens(isTrained, :);
-                    if isempty(trainedAENs)
-                        disp(['INFO: start training autoencoders for spindle speed = ' num2str(spindleSpeed)])
-                        obj.learn([freqs, aeData])
-                    else
-                        if length(sf) ~= length(trainedAENs)
-                            error('frequencies for segmenting does not match number of autoencoders')
-                        end
-                        % iterate through all trainedAENs for this spindleSpeed
-                        sf = freqs(obj.segmentationFreqs);
-                        for a = 1 : length(trainedAENs)
-                            % separate raw data into windows for each frequency scenario
-                            segT = floor(sf(a) * obj.sampleRate);
-                            dw = SignalAnalysis.separateDataIntoWindows(aeData, segT, true);
-                            % predict mse                            
-                            newData = [newData, obj.predictMSE(trainedAENs(a), dw)];
-                        end
-                    end
+                if size(data{1}, 1) > 1
+                    allFreqs = data{1};
+                    allAEData = data{2};
                 else
-                    disp(['INFO: not enough data for training new autoencoder at spindle speed = ' num2str(spindleSpeed)])
+                    allFreqs = data{1};
+                    allAEData = {data{2}};
+                end
+                dim = size(allFreqs, 1);
+                %newData = cell(dim, size(obj.aens, 2)); 
+                newData = cell(dim, size(obj.segmentationFreqs, 1));
+                for d = 1 : dim
+                    freqs = allFreqs(d, :);
+                    freqs = freqs(:);
+                    spindleSpeed = freqs(1); % [Hz]
+                    aeData = allAEData{d};
+
+                    % check if autoencoder for speed exists already!
+                    if isempty(obj.aens)
+                        disp(['INFO: start training autoencoders for spindle speed = ' num2str(spindleSpeed)])
+                        obj.learn({freqs, aeData})
+                        newData = {};
+                        return;
+                    end
+                    % check if spindle speeds already exists
+                    speedInd = obj.checkIfSpindleSpeedExists(spindleSpeed);
+                    if ~isempty(speedInd)                
+                        if speedInd > size(obj.aens, 1)
+                            warning('mismatch speedInd and number of trained AEN')
+                            disp(['INFO: start training autoencoders for spindle speed = ' num2str(spindleSpeed)])
+                            obj.learn([allFreqs, allAEData])
+                            newData = {};
+                            return;
+                        else
+                            trainedAENs = obj.aens(speedInd, :);
+                            if isempty(trainedAENs)
+                                disp(['INFO: start training autoencoders for spindle speed = ' num2str(spindleSpeed)])
+                                obj.learn([freqs, aeData])
+                                newData = {};
+                                return;
+                            else
+                                % iterate through all trainedAENs for this spindleSpeed
+                                sf = freqs(obj.segmentationFreqs);
+                                newData = cell(length(obj.spindleSpeeds), length(obj.segmentationSamples));
+                                for a = 1 : length(trainedAENs)
+                                    % separate raw data into windows for each frequency scenario
+                                    segT = obj.segmentationSamples(speedInd, a);
+                                    dw = SignalAnalysis.separateDataIntoWindows(aeData, segT, true);
+                                    % predict mse
+                                    if ~isempty(dw)
+                                        if isempty(newData{speedInd, a})
+                                            newData{speedInd, a} = obj.predictMSE(trainedAENs{a}, dw);
+                                        else
+                                            newData{speedInd, a} = [newData{speedInd, a}, obj.predictMSE(trainedAENs{a}, dw)];
+                                        end
+                                    else
+                                        warning(['not enough data for segment = ' num2str(segT)])
+                                        newData{d, a} = [];
+                                    end
+                                end
+                            end
+                        end
+                    else
+                        error(['Could not find spindle speed = ' num2str(spindleSpeed)])
+                    end
                 end
             else
-                newData = [];
+                newData = {};
                 warning(['data [' class(data) '] was not of type cell'])
             end
         end
@@ -149,18 +203,34 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
     
     %% Private Helper Methods
     methods (Access = private)
+        
+        function speedInd = checkIfSpindleSpeedExists(obj, spindleSpeed)
+            % check if spindle speeds already exists
+            speedInd = find(obj.spindleSpeeds >= spindleSpeed - obj.speedTol & obj.spindleSpeeds <= spindleSpeed + obj.speedTol);
+            if isempty(speedInd)
+                obj.spindleSpeeds = [obj.spindleSpeeds; floor(spindleSpeed)];
+                speedInd = length(obj.spindleSpeeds);
+            else
+                if length(speedInd) > 1
+                    speedInd = speedInd(1);
+                end 
+            end
+        end
+        
         function aen = createDefaultAEN(obj)
             aen = MyDeepAutoencoder(7, 1);
-            defaultTrainingOptions = {'MaxEpochs', 100};
+            defaultTrainingOptions = {'MaxEpochs', 100, ...
+                                      'MiniBatchSize', 32, ...
+                                      'ExecutionEnvironment', 'cpu'};
             defaultValidationOptions = {'EarlyStopping', true,...
                     'UseValidation',true,...
                     'ValidationFrequency', 10, ...
                     'ValidationPatience', 10, ...
                     'Shuffle','once'};
             defaultNormalizationOptions = {'NormalizationMethod', 'MapZscore'};
-            aen.setTrainingOptions(defaultTrainingOptions);
-            aen.setValidationOptions(defaultValidationOptions);
-            aen.setNormalizationOptions(defaultNormalizationOptions);
+            aen.setTrainingOptions(defaultTrainingOptions{:});
+            aen.setValidationOptions(defaultValidationOptions{:});
+            aen.setNormalizationOptions(defaultNormalizationOptions{:});
         end
     end
 end

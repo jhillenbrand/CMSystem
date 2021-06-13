@@ -24,7 +24,15 @@ classdef MergeTransformer < DataTransformer
             transformedData = data;
             if obj.isEnabled
                 transformedData = obj.transform(transformedData);
-                obj.dataBuffer = [obj.dataBuffer, transformedData];
+                if isempty(obj.dataBuffer)
+                    obj.dataBuffer = transformedData;
+                else
+                    if size(transformedData, 1) ~= size(obj.dataBuffer, 1)
+                        obj.dataBuffer = {obj.dataBuffer, transformedData};
+                    else                    
+                        obj.dataBuffer = [obj.dataBuffer, transformedData];
+                    end
+                end
             end
             obj.transfer(obj.dataBuffer);
             obj.isActive = false;

@@ -20,14 +20,24 @@ classdef ForkTransformer < DataTransformer
     
     %% Interface Methods
     methods
-        
+        function newData = transform(obj, data)
+            newData = [];
+            for t = 1 : length(obj.transformations)
+                trafo = obj.transformations(t);
+                newData = [newData, trafo.apply(data)];
+            end
+        end
     end
     
     %% Static Methods
     methods (Static)
         function newData = fork(data, dataColumns)
             if iscell(data)
-                disp('cell implementation missing')
+                if size(data, 1) >= size(data, 2)
+                    newData = data{dataColumns, :};
+                else
+                    newData = data{:, dataColumns};
+                end
             elseif ismatrix(data)
                 newData = data(:, dataColumns);
             else
