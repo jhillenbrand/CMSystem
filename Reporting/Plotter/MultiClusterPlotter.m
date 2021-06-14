@@ -79,7 +79,7 @@ classdef MultiClusterPlotter < Plotter
                 for j = 1 : size(data, 2)                            
                     if isa(data{i, j}, class(SimpleBoundaryClusterer.empty))
                         if ~isempty(data{i, j}.clusterStates)
-                            if ~isempty(data{i, j}.clusterStates.clusterIndices)
+                            if ~isempty(data{i, j}.clusterStates(end).clusterIndices)
                                 count = count + 1;
                             end
                         end

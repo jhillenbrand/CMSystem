@@ -16,7 +16,7 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
         sampleRate = 2e6;   % sample rate of data to be processed [Hz]
         f_res = 100;
         minLearningWindows = 10;   % minimum number of data windows required for learning of new autoencoder
-        mseMean = false;
+        mseMean = true;
     end
     
     methods
