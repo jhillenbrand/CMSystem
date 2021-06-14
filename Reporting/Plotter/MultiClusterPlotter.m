@@ -35,26 +35,11 @@ classdef MultiClusterPlotter < Plotter
                                     clusterState = data{i, j}.clusterStates(end);
                                     if ~isempty(clusterState.clusterIndices)
                                         subplot(rows, cols, count)
-                                        clusterState.plot(false);    
+                                        clusterState.plot(false);
+                                        ylabel('MSE [-]')
+                                        title(['Speed ' num2str(i) ', Segmentation ' num2str(j)])
+                                        P.removeXAxisTicks(true);
                                         count = count + 1;
-%                                         z = clusterState.dataPoints;
-%                                         x = i * ones(size(z));
-%                                         y = j * ones(size(z));
-%                                         if ~first 
-%                                             hold on 
-%                                         else    
-%                                             first = false;                                 
-%                                         end   
-%                                         P.gscatter3(x, y, z, clusterState.clusterIndices)
-% %                                         for k = 2 : length(clusterState.clusterPoints)
-% %                                             cps_z = clusterState.clusterPoints{k, 1};
-% %                                             cps_x = x(1) * ones(size(cps_z));
-% %                                             cps_y = y(1) * ones(size(cps_z));
-% %                                             bi = boundary(cps_z, cps_x);
-% %                                             hold on
-% %                                             plot3(cps_x(bi), cps_y(bi), cps_z(bi), 'k--')
-% %                                             hold off
-% %                                         end
                                     end
                                 end
                             else
