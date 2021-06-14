@@ -29,6 +29,10 @@ classdef MultiClusterPlotter < Plotter
             if ~isempty(data)
                 if iscell(data)
                     first = true;
+                    countPlots = obj.countNonEmptyClusterers(data);                    
+                    rows = ceil(countPlots / 2);
+                    cols = ceil(countPlots / rows);
+                    count = 1;
                     for i = 1 : size(data, 1)
                         for j = 1 : size(data, 2)                            
                             if isa(data{i, j}, class(SimpleBoundaryClusterer.empty))
@@ -37,24 +41,27 @@ classdef MultiClusterPlotter < Plotter
                                 else
                                     clusterState = data{i, j}.clusterStates(end);
                                     if ~isempty(clusterState.clusterIndices)
-                                        z = clusterState.dataPoints;
-                                        x = i * ones(size(z));
-                                        y = j * ones(size(z));
-                                        if ~first 
-                                            hold on 
-                                        else    
-                                            first = false;                                 
-                                        end   
-                                        P.gscatter3(x, y, z, clusterState.clusterIndices)
-%                                         for k = 2 : length(clusterState.clusterPoints)
-%                                             cps_z = clusterState.clusterPoints{k, 1};
-%                                             cps_x = x(1) * ones(size(cps_z));
-%                                             cps_y = y(1) * ones(size(cps_z));
-%                                             bi = boundary(cps_z, cps_x);
-%                                             hold on
-%                                             plot3(cps_x(bi), cps_y(bi), cps_z(bi), 'k--')
-%                                             hold off
-%                                         end
+                                        subplot(rows, cols, count)
+                                        clusterState.plot(false, true);    
+                                        count = count + 1;
+%                                         z = clusterState.dataPoints;
+%                                         x = i * ones(size(z));
+%                                         y = j * ones(size(z));
+%                                         if ~first 
+%                                             hold on 
+%                                         else    
+%                                             first = false;                                 
+%                                         end   
+%                                         P.gscatter3(x, y, z, clusterState.clusterIndices)
+% %                                         for k = 2 : length(clusterState.clusterPoints)
+% %                                             cps_z = clusterState.clusterPoints{k, 1};
+% %                                             cps_x = x(1) * ones(size(cps_z));
+% %                                             cps_y = y(1) * ones(size(cps_z));
+% %                                             bi = boundary(cps_z, cps_x);
+% %                                             hold on
+% %                                             plot3(cps_x(bi), cps_y(bi), cps_z(bi), 'k--')
+% %                                             hold off
+% %                                         end
                                     end
                                 end
                             else
@@ -71,5 +78,23 @@ classdef MultiClusterPlotter < Plotter
             end
         end
     end
+    
+    methods (Access = private)
+        function count = countNonEmptyClusterers(obj, data)
+            count = 0;
+            for i = 1 : size(data, 1)
+                for j = 1 : size(data, 2)                            
+                    if isa(data{i, j}, class(SimpleBoundaryClusterer.empty))
+                        if ~isempty(data{i, j}.clusterStates)
+                            if ~isempty(data{i, j}.clusterStates.clusterIndices)
+                                count = count + 1;
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
 end
 
