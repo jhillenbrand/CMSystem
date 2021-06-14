@@ -12,14 +12,7 @@ classdef MultiClusterPlotter < Plotter
     methods
         function obj = MultiClusterPlotter()
             %MultiClusterPlotter 
-            obj@Plotter();            
-            view(30, 30)
-            grid on
-            grid minor
-            box on
-            xlabel('Speeds [-]')
-            ylabel('Segmentations [-]')
-            zlabel('MSE [-]')
+            obj@Plotter();      
         end
     end
     
@@ -42,7 +35,7 @@ classdef MultiClusterPlotter < Plotter
                                     clusterState = data{i, j}.clusterStates(end);
                                     if ~isempty(clusterState.clusterIndices)
                                         subplot(rows, cols, count)
-                                        clusterState.plot(false, true);    
+                                        clusterState.plot(false);    
                                         count = count + 1;
 %                                         z = clusterState.dataPoints;
 %                                         x = i * ones(size(z));
