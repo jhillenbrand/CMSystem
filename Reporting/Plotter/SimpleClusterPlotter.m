@@ -21,6 +21,7 @@ classdef SimpleClusterPlotter < Plotter
             if ~isempty(data)
                 if isa(data, class(SimpleBoundaryClusterer.empty))
                     data.clusterStates(end).plot(obj.plotCenterTrend);
+                    drawnow
                 else
                     error(['data is not of type ClusterState'])
                 end

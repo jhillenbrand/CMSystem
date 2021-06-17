@@ -35,7 +35,7 @@ classdef AESpeedSegmenter < Segmenter
                         aeInd = t_ae >= ts1 & t_ae <= ts2;
                         ds_ae = d_ae(aeInd);
                         ae_sections{s, 1} = ds_ae;
-                        speeds(s, 1) = floor(mean(sd(:, 2)));
+                        speeds(s, 1) = floor(mean(abs(sd(:, 2))));  % take mean and absolute values
                     end
                     if iscell(ae_sections)
                         if length(ae_sections) > 1
