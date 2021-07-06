@@ -52,23 +52,23 @@ classdef AESpeedSegmenter < Segmenter
                             ae_sections{s, 1} = ds_ae;
                             speeds(s, 1) = floor(mean(abs(sd(:, 2))));  % take mean and absolute values                        
                         end
-                        if iscell(ae_sections)
-                            if length(ae_sections) > 1
-                                if ~obj.returnAllSegmentData
-                                    newData = {ae_sections, speeds};
-                                else
-                                    newData = ae_sections;
-                                end
+                    end
+                    if iscell(ae_sections)
+                        if length(ae_sections) > 1
+                            if ~obj.returnAllSegmentData
+                                newData = {ae_sections, speeds};
                             else
-                                if ~obj.returnAllSegmentData
-                                    newData = [ae_sections, speeds];
-                                else
-                                    newData = ae_sections;
-                                end
+                                newData = ae_sections;
                             end
                         else
-                            error('unkown ae section output')
+                            if ~obj.returnAllSegmentData
+                                newData = [ae_sections, speeds];
+                            else
+                                newData = ae_sections;
+                            end
                         end
+                    else
+                        error('unkown ae section output')
                     end                    
                 else
                     newData = [];
