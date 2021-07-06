@@ -12,6 +12,10 @@ classdef AESpeedSegmenter < Segmenter
     methods
         function obj = AESpeedSegmenter()
             %AESPEEDSEGMENTER
+            if nargin < 1
+                name = [class(AESpeedSegmenter.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'];
+            end
+            obj@Segmenter(name);
         end
     end
     
@@ -37,7 +41,7 @@ classdef AESpeedSegmenter < Segmenter
                             speedInd = t_plc >= ts1 & t_plc <= ts2;
                             ds_ae = d_ae(aeInd);
                             ts_ae = t_ae(aeInd);
-                            ae_sections{s, 1} = [ds_ae, ts_ae];
+                            ae_sections{s, 1} = [ts_ae, ds_ae];
                             ae_sections{s, 2} = sd;
                         end
                     else

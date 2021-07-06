@@ -24,6 +24,7 @@ classdef Plotter < Reporter
         %% - Plotter
         function obj = Plotter(noFigure)
             %PLOTTER
+            obj@Reporter(['Plotter [' char(java.util.UUID.randomUUID().toString()) ']']);
             if nargin < 1
                 noFigure = false;
             end

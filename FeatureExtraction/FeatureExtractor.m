@@ -11,6 +11,12 @@ classdef FeatureExtractor < DataTransformer
     
     methods 
         function obj = FeatureExtractor(name, transformation)
+            if nargin < 1
+               name = [class(FeatureExtractor.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'];
+            end
+            if nargin < 2
+                transformation = [];
+            end
             obj@DataTransformer(name, transformation);
         end
     end

@@ -5,9 +5,12 @@ classdef Historian < Reporter
     end
     
     methods
-        function obj = Historian()
+        function obj = Historian(name)
             %HISTORIAN Construct an instance of this class
-            
+            if nargin < 1
+                name = ['Historian [' char(java.util.UUID.randomUUID().toString()) ']'];
+            end
+            obj@Reporter(name);
         end
     end
     

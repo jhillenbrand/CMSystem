@@ -12,7 +12,7 @@ classdef DataAcquisitor < DataTransformer & DataAcquisitorInterface
     
     methods
         function obj = DataAcquisitor(requestSamples, requestOnlyAvailable)
-            obj.name = 'DataAcquisitor1';
+            obj.name = ['DataAcquisitor [' char(java.util.UUID.randomUUID().toString()) ']'];
             if nargin == 1
                 requestOnlyAvailable = false;                
             end

@@ -6,7 +6,7 @@ classdef DataTransformer < DataTransformerInterface
     %DATATRANSFORMER
     
     properties
-        name = [class(DataTransformer.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'];
+        name = '';
         observers = DataTransformer.empty();
         transformations = Transformation.empty();
         isActive = false;
@@ -17,12 +17,15 @@ classdef DataTransformer < DataTransformerInterface
     
     methods
         function obj = DataTransformer(name, transformation)
+            if nargin < 1
+                name = [class(DataTransformer.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'];
+            end
             if nargin > 1
                 if ~isempty(transformation)
                     obj.addTransformation(transformation);
                 end
-                obj.name = name;
             end
+            obj.name = name;
         end
     end
     
@@ -83,6 +86,27 @@ classdef DataTransformer < DataTransformerInterface
             else
                 warning(['no data for transfer from ' obj.name])
             end
+        end
+    end
+    
+    %% Visualization
+    methods
+        function showObservers(obj)
+            
+        end
+        
+        function TM = getObserverMatrix(obj)
+            
+        end
+        
+        function observerNames = getObserverNamesRecursively(obj, startNames)
+            numOfObservers = length(obj.observers);
+            observerNames = startNames;
+            observerNames{end + 1, 1} = obj.name;
+            for o = 1 : numOfObservers
+                observerNames = obj.observers(o).getObserverNamesRecursively(observerNames);
+            end
+            observerNames = unique(observerNames);
         end
     end
     
