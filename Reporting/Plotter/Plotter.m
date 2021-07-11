@@ -34,6 +34,7 @@ classdef Plotter < Reporter
                 if obj.docked
                     set(gcf, 'WindowStyle', 'docked') % Insert the figure to dock
                 end
+                set(gcf,'color','w');
             end
         end
         
