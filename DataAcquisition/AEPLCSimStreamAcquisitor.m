@@ -30,6 +30,11 @@ classdef AEPLCSimStreamAcquisitor < SimStreamAcquisitor
             if obj.dataStream.moreDataAvailable
                 % Step 1: load continously sampled data and start timestamp                
                 d_ae = obj.dataStream.nextData();                
+                if isempty(d_ae)
+                    warning(['No data returned from ' class(AEPLCSimStreamAcquisitor.empty) ' ' obj.name]);
+                    newData = [];
+                    return;
+                end
                 ts_start_ae = obj.dataStream.dataParserObj.FileNameFieldValues(1);
                 
                 % Step 2: calculate unixtime_ms for the AE data based on extracted
@@ -82,7 +87,11 @@ classdef AEPLCSimStreamAcquisitor < SimStreamAcquisitor
                 %         period as the sampled Data
 
                 % check if extra time padding is requested
-                indsLog = (t_plc >= t_ae(1) & t_plc <= t_ae(end));
+                try 
+                    indsLog = (t_plc >= t_ae(1) & t_plc <= t_ae(end));
+                catch e
+                    disp(e.message)
+                end
                 t_plc = t_plc(indsLog);
                 d_plc = d_plc(indsLog, :);
                 if isempty(t_plc)
