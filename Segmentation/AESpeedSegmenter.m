@@ -5,8 +5,9 @@ classdef AESpeedSegmenter < Segmenter
     properties
         minWindowSize = 6;
         minSpeed = 10;
-        tau = 2.5;
+        tau = 3;
         returnAllSegmentData = false;
+        returnOnly1Segment = true;
     end
     
     methods
@@ -73,7 +74,14 @@ classdef AESpeedSegmenter < Segmenter
                         end
                     else
                         error('unkown ae section output')
-                    end                    
+                    end 
+                    if obj.returnOnly1Segment
+                        if iscell(newData{1, 1})
+                            nd1 =  newData{1, 1};
+                            nd2 = newData{1, 2};
+                            newData = {nd1{1}, nd2(1)};
+                        end
+                    end
                 else
                     newData = [];
                 end

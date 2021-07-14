@@ -22,9 +22,12 @@ classdef Plotter < Reporter
     
     methods
         %% - Plotter
-        function obj = Plotter(noFigure)
+        function obj = Plotter(noFigure, name)
             %PLOTTER
-            obj@Reporter(['Plotter [' char(java.util.UUID.randomUUID().toString()) ']']);
+            if nargin < 2
+                name = [class(Plotter.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'];
+            end
+            obj@Reporter(name);
             if nargin < 1
                 noFigure = false;
             end
@@ -34,6 +37,7 @@ classdef Plotter < Reporter
                 if obj.docked
                     set(gcf, 'WindowStyle', 'docked') % Insert the figure to dock
                 end
+                set(gcf, 'Name', obj.name, 'NumberTitle', 'off')
                 set(gcf,'color','w');
             end
         end

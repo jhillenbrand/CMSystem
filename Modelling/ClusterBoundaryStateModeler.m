@@ -2,18 +2,23 @@ classdef ClusterBoundaryStateModeler < Modeler
     %ClusterBoundaryStateModeler
     
     properties
-        clusterTracker = ClusterTracking.empty;
-        transitionHistory = [];                    
+        clusterTracker = ClusterBoundaryTracking2.empty;                    
     end
-    
-    properties
-        reduceMemory = true;
-    end
-    
+       
     methods
-        function obj = ClusterBoundaryStateModeler()
-            %ClusterBoundaryStateModeler
-            obj.clusterTracker = ClusterTracking();
+        function obj = ClusterBoundaryStateModeler(featureNames)
+            %ClusterBoundaryStateModeler(featureNames)
+            if nargin < 1
+                featureNames =  {};
+            end
+            obj@Modeler([class(ClusterBoundaryStateModeler.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']']);
+            obj.clusterTracker = ClusterBoundaryTracking2();
+            obj.clusterTracker.featureNames = featureNames;
+            obj.clusterTracker.keepDataPoints = false;
+            obj.clusterTracker.displayClustering = false;
+            obj.clusterTracker.displayTransitions = false;
+            obj.clusterTracker.clusterEachIteration = false;
+            obj.clusterTracker.verbose = false;
         end
     end
     
@@ -24,23 +29,14 @@ classdef ClusterBoundaryStateModeler < Modeler
             %TRANSFORM(obj, data)
             newData = [];
             if ~isempty(data)
-                if isa(data, class(SimpleBoundaryClusterer.empty))
-                    obj.transitionHistory = [obj.transitionHistory; data];                    
-                    % get last two clusterStates
-                    if length(data.clusterStates) > 2
-                        cs_i = data.clusterStates(end - 1);
-                        cs_j = data.clusterStates(end);
-                        transitions = obj.clusterTracker.track(cs_i, cs_j);
-                        cs_i.reduceMemory();
-                        newData = transitions;
-                    else
-                        warning([class(ClusterTrackingModeler.empty) ' --> waiting for second complete clusterState']);
-                    end
+                if isnumeric(data)
+                    obj.clusterTracker.processNewData(data);
+                    newData = obj.clusterTracker;
                 else
-                    error([class(ClusterTrackingModeler.empty) ' --> data passed to transform step must be of class ' class(ClusterTrackingModeler.empty)]);
+                    error([class(ClusterBoundaryStateModeler.empty) ' --> data passed to transform step must be numeric']);
                 end
             else
-                warning([class(ClusterTrackingModeler.empty) ' --> no data was passed to transform step']);
+                warning([class(ClusterBoundaryStateModeler.empty) ' --> no data was passed to transform step']);
             end
         end
     end

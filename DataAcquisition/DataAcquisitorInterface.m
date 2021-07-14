@@ -10,7 +10,10 @@ classdef DataAcquisitorInterface < handle
         newData = requestAvailableData(obj)
         
         % returns newData containing newData that is captured for nSamples after method execution
-        newData = requestData(obj, nSamples)   
+        newData = requestData(obj, nSamples)  
+        
+        % return true/false whether more data is available in stream
+        bool = isDataAvailable(obj)
     end
 end
 

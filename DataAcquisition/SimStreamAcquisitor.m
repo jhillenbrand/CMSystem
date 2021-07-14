@@ -3,7 +3,7 @@
 % @DATE 01.12.2020
 % @DEPENDENCY
 classdef SimStreamAcquisitor < DataAcquisitor
-    %RANDSINEACQUISITOR
+    %SimStreamAcquisitor
     
     properties
         files = {};
@@ -14,7 +14,9 @@ classdef SimStreamAcquisitor < DataAcquisitor
     end
         
     methods
+        %% - SimStreamAcquisitor
         function obj = SimStreamAcquisitor(dataParserObj, files, bufferSize, stepSize, verbose)
+            %SimStreamAcquisitor(dataParserObj, files, bufferSize, stepSize, verbose)
             obj@DataAcquisitor(0, true);
             if nargin > 0
                 obj.files = files;
@@ -27,8 +29,11 @@ classdef SimStreamAcquisitor < DataAcquisitor
             obj.verbose = verbose;
             obj.dataStream = SimulateDataStream_v2(dataParserObj, obj.files, obj.bufferSize, obj.stepSize);
             obj.dataStream.verbose = obj.verbose;
-        end
-        
+        end        
+    end
+       
+    %% Interface Methods
+    methods
         function newData = requestAvailableData(obj)
             %REQUESTAVAILABLEDATA(obj)
             if obj.dataStream.moreDataAvailable
@@ -43,7 +48,10 @@ classdef SimStreamAcquisitor < DataAcquisitor
             warning(['method requestData is not implemented for ' class(SimStreamAcquisitor.Empty) ', method requestAvailableData is used instead'])
             newData = obj.requestAvailableData();
         end
-        
+    
+        function bool = isDataAvailable(obj)
+            bool = obj.dataStream.moreDataAvailable;
+        end
     end
 end
 

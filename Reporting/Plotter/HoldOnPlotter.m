@@ -2,14 +2,14 @@ classdef HoldOnPlotter < Plotter
     %PLOTTER 
     
     properties
-        maxHoldOn = 100;
+        maxHoldOn = 1000;
         holdOnCount = 0;
     end
     
     methods
         function obj = HoldOnPlotter()
             %HOLDONPLOTTER
-            obj@Plotter();
+            obj@Plotter(false, [class(HoldOnPlotter.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']']);
             % preset holdOnCount to maxHoldOn to make sure plot is cleaned
             %   on first plot cmd
             obj.holdOnCount = obj.maxHoldOn + 1;
