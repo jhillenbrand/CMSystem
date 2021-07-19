@@ -28,22 +28,24 @@ classdef MultiClusterPlotter2 < Plotter
                     count = 1;
                     for i = 1 : size(data, 1)
                         for j = 1 : size(data, 2)                            
-                            if isa(data{i, j}, class(ClusterBoundaryTracking2.empty))
-                                if isempty(data{i, j}.lastClustering)
-                                    warning(['no cluster states found in ' class(ClusterBoundaryTracking2.empty) '(' num2str(i) ',' num2str(j) ') in' obj.name]);
-                                else
-                                    clustering = data{i, j}.lastClustering;
-                                    if ~isempty(clustering.clusterIndices)
-                                        subplot(rows, cols, count)
-                                        clustering.plot(false);
-                                        ylabel('MSE [-]')
-                                        title(['Speed ' num2str(i) ', Segmentation ' num2str(j)])
-                                        P.removeXAxisTicks(true);
-                                        count = count + 1;
+                            if ~isempty(data{i, j})
+                                if isa(data{i, j}, class(ClusterBoundaryTracking2.empty))
+                                    if isempty(data{i, j}.lastClustering)
+                                        warning(['no cluster states found in ' class(ClusterBoundaryTracking2.empty) '(' num2str(i) ',' num2str(j) ') in' obj.name]);
+                                    else
+                                        clustering = data{i, j}.lastClustering;
+                                        if ~isempty(clustering.clusterIndices)
+                                            subplot(rows, cols, count)
+                                            clustering.plot(false);
+                                            ylabel('MSE [-]')
+                                            title(['Speed ' num2str(i) ', Segmentation ' num2str(j)])
+                                            P.removeXAxisTicks(true);
+                                            count = count + 1;
+                                        end
                                     end
+                                else
+                                    error(['data[' class(data{i, j}) '] is not of type ' class(ClusterBoundaryTracking2.empty)])
                                 end
-                            else
-                                error(['data[' class(data{i, j}) '] is not of type ' class(ClusterBoundaryTracking2.empty)])
                             end
                         end
                     end

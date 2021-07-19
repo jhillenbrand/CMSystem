@@ -7,7 +7,7 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
     
     properties
         spindleSpeeds = [];
-        speedTol = 2;   % new spindle speed must fall within +/- speedTol, to be considered same speed
+        speedTol = 2 / 60;   % [1/s] new spindle speed must fall within +/- speedTol, to be considered same speed
         segmentationFreqs = [2; 4; 5];
         segmentationSamples = [];   % variable to store the segmentation windows, also used for autoencoder feature input layer size
         learningData = {};
@@ -79,14 +79,15 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
             speedInd = obj.checkIfSpindleSpeedExists(spindleSpeed);
             
             % store learning data
+            disp(['INFO: add training data to autoencoders for spindle speed = ' num2str(spindleSpeed)])               
             if isempty(obj.learningData)
-                obj.learningData{speedInd, 1} = aeData;
+               obj.learningData{speedInd, 1} = aeData;
             else
                 if size(obj.learningData, 1) < speedInd
                     obj.learningData{speedInd, 1} = aeData;
                 else
                     obj.learningData{speedInd, 1} = [obj.learningData{speedInd, 1}; aeData];
-                   end
+                end
             end 
             
             % check if dataBuffer contains enough data for learning for specific segmentation window                
@@ -147,7 +148,6 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
 
                     % check if autoencoder for speed exists already!
                     if isempty(obj.aens)
-                        disp(['INFO: start training autoencoders for spindle speed = ' num2str(spindleSpeed)])
                         obj.learn({freqs, aeData})
                         newData = {};
                         return;
