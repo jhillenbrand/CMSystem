@@ -33,13 +33,17 @@ classdef Plotter < Reporter
             end
             if ~noFigure                
                 obj.F = obj.incrementFigureIndex();
-                figure(obj.F);
-                if obj.docked
-                    set(gcf, 'WindowStyle', 'docked') % Insert the figure to dock
-                end
-                set(gcf, 'Name', obj.name, 'NumberTitle', 'off')
-                set(gcf,'color','w');
+                obj.createFigure();
             end
+        end
+        
+        function createFigure(obj)
+            figure(obj.F);
+            if obj.docked
+                set(gcf, 'WindowStyle', 'docked') % Insert the figure to dock
+            end
+            set(gcf, 'Name', obj.name, 'NumberTitle', 'off')
+            set(gcf,'color','w');
         end
         
         function setFigure(obj, index)

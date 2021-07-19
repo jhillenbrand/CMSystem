@@ -7,7 +7,7 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
     
     properties
         spindleSpeeds = [];
-        speedTol = 2 / 60;   % [1/s] new spindle speed must fall within +/- speedTol, to be considered same speed
+        speedTol = 2;   % [1/min] new spindle speed must fall within +/- speedTol, to be considered same speed
         segmentationFreqs = [2; 4; 5];
         segmentationSamples = [];   % variable to store the segmentation windows, also used for autoencoder feature input layer size
         learningData = {};
@@ -66,67 +66,7 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
     end
     
     %% Interface Methods
-    methods       
-        %% - learn
-        function learn(obj, data)
-            %LEARN implements the LearnableInterface Method
-            
-            freqs = data{1}; % frequencies
-            spindleSpeed = freqs(1);
-            aeData = data{2}; % AE Data           
-           
-            % check if spindle speeds already exists
-            speedInd = obj.checkIfSpindleSpeedExists(spindleSpeed);
-            
-            % store learning data
-            disp(['INFO: add training data to autoencoders for spindle speed = ' num2str(spindleSpeed)])               
-            if isempty(obj.learningData)
-               obj.learningData{speedInd, 1} = aeData;
-            else
-                if size(obj.learningData, 1) < speedInd
-                    obj.learningData{speedInd, 1} = aeData;
-                else
-                    obj.learningData{speedInd, 1} = [obj.learningData{speedInd, 1}; aeData];
-                end
-            end 
-            
-            % check if dataBuffer contains enough data for learning for specific segmentation window                
-            sf = freqs(obj.segmentationFreqs);    % segmentation frequencies
-            enoughForTraining = false;
-            for s = 1 : length(sf)
-                segN = 1 / sf(s);
-                learnN = obj.sampleRate * segN * obj.minLearningWindows;
-                if length(obj.learningData{speedInd, 1}) >= learnN
-                    enoughForTraining = true;
-                else
-                    enoughForTraining = false;
-                    break;
-                end                
-            end
-            
-            if enoughForTraining
-                for s = 1 : length(sf)
-                    segN = floor(1 / sf(s) * obj.sampleRate);
-                    ld = obj.learningData{speedInd, 1};
-                    % determine hidden layer 
-                    dw = SignalAnalysis.separateDataIntoWindows(ld, segN, true);
-                    [f, p, t] = SignalAnalysis.fftPowerSpectrum(dw, obj.sampleRate);
-                    pMean = mean(p, 2);
-                    [locs, peaks, numOfPeaks] = PeakFinder.peaksByKneePointSearch(f, pMean, obj.f_res, false, 2);
-                    % init autoencoder
-                    aen = obj.createDefaultAEN();
-                    aen.setHiddenWidth(numOfPeaks);
-                    % train autoencoder with spectrum
-                    disp(['INFO: train autoencoder for speed = ' num2str(spindleSpeed) ', segment = ' num2str(segN)])
-                    aen.train(p);
-                    obj.aens{speedInd, s} = aen;
-                    obj.segmentationSamples(speedInd, s) = segN;
-                end
-                % delete learningData for corresponding speed
-                obj.learningData{speedInd, 1} = [];
-            end
-        end
-        
+    methods
         %% - transform
         function newData = transform(obj, data)
             if iscell(data)
@@ -139,11 +79,11 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
                 end
                 dim = size(allFreqs, 1);
                 %newData = cell(dim, size(obj.aens, 2)); 
-                newData = cell(dim, size(obj.segmentationFreqs, 1));
+                %newData = cell(dim, size(obj.segmentationFreqs, 1));
                 for d = 1 : dim
                     freqs = allFreqs(d, :);
                     freqs = freqs(:);
-                    spindleSpeed = freqs(1); % [Hz]
+                    spindleSpeed = freqs(1) * 60; % [1/min]
                     aeData = allAEData{d};
 
                     % check if autoencoder for speed exists already!
@@ -198,12 +138,73 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
                 newData = {};
                 warning(['data [' class(data) '] was not of type cell'])
             end
+        end        
+        
+        %% - learn
+        function learn(obj, data)
+            %LEARN implements the LearnableInterface Method
+            
+            freqs = data{1}; % frequencies
+            spindleSpeed = freqs(1) * 60; % [1/min]
+            aeData = data{2}; % AE Data           
+           
+            % check if spindle speeds already exists
+            speedInd = obj.checkIfSpindleSpeedExists(spindleSpeed);
+            
+            % store learning data
+            disp(['INFO: add training data to autoencoders for spindle speed = ' num2str(spindleSpeed)])               
+            if isempty(obj.learningData)
+               obj.learningData{speedInd, 1} = aeData;
+            else
+                if size(obj.learningData, 1) < speedInd
+                    obj.learningData{speedInd, 1} = aeData;
+                else
+                    obj.learningData{speedInd, 1} = [obj.learningData{speedInd, 1}; aeData];
+                end
+            end 
+            
+            % check if dataBuffer contains enough data for learning for specific segmentation window                
+            sf = freqs(obj.segmentationFreqs);    % segmentation frequencies
+            enoughForTraining = false;
+            for s = 1 : length(sf)
+                segN = 1 / sf(s);
+                learnN = obj.sampleRate * segN * obj.minLearningWindows;
+                if length(obj.learningData{speedInd, 1}) >= learnN
+                    enoughForTraining = true;
+                else
+                    enoughForTraining = false;
+                    break;
+                end                
+            end
+            
+            if enoughForTraining
+                for s = 1 : length(sf)
+                    segN = floor(1 / sf(s) * obj.sampleRate);
+                    ld = obj.learningData{speedInd, 1};
+                    % determine hidden layer 
+                    dw = SignalAnalysis.separateDataIntoWindows(ld, segN, true);
+                    [f, p, t] = SignalAnalysis.fftPowerSpectrum(dw, obj.sampleRate);
+                    pMean = mean(p, 2);
+                    [locs, peaks, numOfPeaks] = PeakFinder.peaksByKneePointSearch(f, pMean, obj.f_res, false, 2);
+                    % init autoencoder
+                    aen = obj.createDefaultAEN();
+                    aen.setHiddenWidth(numOfPeaks);
+                    % train autoencoder with spectrum
+                    disp(['INFO: train autoencoder for speed = ' num2str(spindleSpeed) ', segment = ' num2str(segN)])
+                    aen.train(p);
+                    obj.aens{speedInd, s} = aen;
+                    obj.segmentationSamples(speedInd, s) = segN;
+                end
+                % delete learningData for corresponding speed
+                obj.learningData{speedInd, 1} = [];
+            end
         end
+        
+        
     end
     
     %% Private Helper Methods
     methods (Access = private)
-        
         function speedInd = checkIfSpindleSpeedExists(obj, spindleSpeed)
             % check if spindle speeds already exists
             speedInd = find(obj.spindleSpeeds >= spindleSpeed - obj.speedTol & obj.spindleSpeeds <= spindleSpeed + obj.speedTol);

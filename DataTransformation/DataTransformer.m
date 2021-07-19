@@ -152,9 +152,28 @@ classdef DataTransformer < DataTransformerInterface
         function disable(obj)
             obj.isEnabled = false;
         end
-    end 
+    end
+    
     %% UTILITY Methods (Static)
-    methods (Static, Access = protected)
+    methods (Static)
+        %% - reinitPlotter
+        function reinitPlotter(transformer)
+            %REINITPLOTTER(transformer) goes through all connected observer recursively and
+            %   recreates figure handles for each plotter found during process
+            
+            if isa(transformer, class(Plotter.empty))
+                transformer.createFigure();
+            end
+            
+            for t = 1 : length(transformer.observers)
+                DataTransformer.reinitPlotter(transformer.observers(t));
+            end
+            
+        end        
+    end
+    
+    %% UTILITY Methods (Static / protected)
+    methods (Static, Access = protected)        
         function bool = is1D(data)
             if sum(size(data) == 1) == 1 || isscalar(data)
                 bool = true;

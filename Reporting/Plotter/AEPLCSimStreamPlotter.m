@@ -7,6 +7,7 @@ classdef AEPLCSimStreamPlotter < Plotter
     methods
         function obj = AEPLCSimStreamPlotter()
             %SIMSTREAMFILEPLOTTER
+            obj@Plotter(false, [class(AEPLCSimStreamPlotter.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']']);
         end
     end
     
