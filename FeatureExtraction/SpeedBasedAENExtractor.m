@@ -192,6 +192,8 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
                     % train autoencoder with spectrum
                     disp(['INFO: train autoencoder for speed = ' num2str(spindleSpeed) ', segment = ' num2str(segN)])
                     aen.train(p);
+                    % remove validation data to save memory
+                    aen.removeValidationData();
                     obj.aens{speedInd, s} = aen;
                     obj.segmentationSamples(speedInd, s) = segN;
                 end
