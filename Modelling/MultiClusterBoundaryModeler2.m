@@ -36,6 +36,8 @@ classdef MultiClusterBoundaryModeler2 < Modeler
                                 continue;
                             end
                             clusterer.processNewData(X);
+                            
+                            clusterer.name = ['Tracker ' num2str(i) '/' num2str(j)];
                             obj.boundaryClusterers{i, j} = clusterer;                                
                         end
                     end
