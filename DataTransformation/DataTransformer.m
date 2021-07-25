@@ -175,7 +175,7 @@ classdef DataTransformer < DataTransformerInterface
     %% UTILITY Methods (Static / protected)
     methods (Static, Access = protected)        
         function bool = is1D(data)
-            if sum(size(data) == 1) == 1 || isscalar(data)
+            if size(data, 2) == 1
                 bool = true;
             else
                 bool = false;
@@ -183,7 +183,7 @@ classdef DataTransformer < DataTransformerInterface
         end
         
         function bool = is2D(data)
-            if length(size(data)) == 2
+            if size(data, 2) == 2
                 bool = true;
             else
                 bool = false;
@@ -191,7 +191,7 @@ classdef DataTransformer < DataTransformerInterface
         end
         
         function bool = is3D(data)
-            if length(size(data)) == 3
+            if size(data, 2) == 3
                 bool = true;
             else
                 bool = false;
