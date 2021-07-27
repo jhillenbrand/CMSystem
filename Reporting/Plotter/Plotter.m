@@ -6,6 +6,8 @@ classdef Plotter < Reporter
         numOfDataPoints = 0;
         docked = true;
         noFocus = true;
+        axisLabels = {};
+        legends = {}
     end
     
     %% static variable for figure index
@@ -69,19 +71,35 @@ classdef Plotter < Reporter
             % report function contains the actual logic of corresponding
             % plotter
             obj.report(data);
+            drawnow
             newData = data;
         end
         
         function report(obj, data)
             if DataTransformer.is1D(data)
                 P.plot1DFeatures(data);
+                if ~isempty(obj.axisLabels)
+                    ylabel(obj.axisLabels{1});
+                end
             elseif DataTransformer.is2D(data)
-                P.plot2DFeatures(data);  
+                P.plot2DFeatures(data);
+                if ~isempty(obj.axisLabels)
+                    xlabel(obj.axisLabels{1});
+                    ylabel(obj.axisLabels{2});
+                end
             elseif DataTransformer.is3D(data)
-                P.plot3DFeatures(data);  
+                P.plot3DFeatures(data); 
+                if ~isempty(obj.axisLabels)
+                    xlabel(obj.axisLabels{1});
+                    ylabel(obj.axisLabels{2});
+                    zlabel(obj.axisLabels{3});
+                end
             else
                 size(data)
                 error('dimensions of data are not supported for plotting');
+            end
+            if ~isempty(obj.legends)
+                legend(obj.legends);
             end
         end
     end

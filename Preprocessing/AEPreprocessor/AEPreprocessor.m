@@ -58,7 +58,7 @@ classdef AEPreprocessor < Preprocessor
             if removeStillstand
                 % remove stillstand sections if present defined by noise
                 % lower and upper limit
-                newData = SignalAnalysis.removeWindowsInRange(newData, stillstandLowerLimit, stillstandUpperLimit, ceil(sampleRate * 0.1), false);
+                newData = SignalAnalysis.removeWindowsInRange(newData, stillstandLowerLimit, stillstandUpperLimit, ceil(sampleRate * 0.1), false, 5);
             end
             if isempty(newData)
                 newData = [NaN; NaN];

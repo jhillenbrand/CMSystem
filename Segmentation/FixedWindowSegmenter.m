@@ -22,5 +22,9 @@ classdef FixedWindowSegmenter < Segmenter
             obj.addTransformation(trafo);
         end        
     end
+    
+    %% interface methods
+    methods
+    end
 end
 
