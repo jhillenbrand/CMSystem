@@ -14,6 +14,7 @@ classdef ClusterBoundaryStateModeler < Modeler
             obj@Modeler([class(ClusterBoundaryStateModeler.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']']);
             obj.clusterTracker = ClusterBoundaryTracking2();
             obj.clusterTracker.featureNames = featureNames;
+            obj.clusterTracker.minDataPoints = 25;
             obj.clusterTracker.keepDataPoints = false;
             obj.clusterTracker.displayClustering = false;
             obj.clusterTracker.displayTransitions = false;
