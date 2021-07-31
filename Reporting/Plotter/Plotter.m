@@ -45,7 +45,7 @@ classdef Plotter < Reporter
                 set(gcf, 'WindowStyle', 'docked') % Insert the figure to dock
             end
             set(gcf, 'Name', obj.name, 'NumberTitle', 'off')
-            set(gcf,'color','w');
+            set(gcf,'color', 'w');
         end
         
         function setFigure(obj, index)
@@ -56,6 +56,16 @@ classdef Plotter < Reporter
             close(figure(obj.F));
             figure(obj.F);
         end
+        
+        function enable(obj)
+            enable@DataTransformer(obj)
+            obj.createFigure();
+        end
+        
+        function disable(obj)
+            disable@DataTransformer(obj)
+            close(figure(obj.F));
+        end
     end
     
     %% Interface Methods
@@ -63,15 +73,17 @@ classdef Plotter < Reporter
         function newData = transform(obj, data)
             % get focus back to figure (in background or foreground)
             % depending on config
-            if obj.noFocus
-                set(groot, 'CurrentFigure', obj.F);
-            else
-                figure(obj.F);
+            if obj.isEnabled
+                if obj.noFocus
+                    set(groot, 'CurrentFigure', obj.F);
+                else
+                    figure(obj.F);
+                end
+                % report function contains the actual logic of corresponding
+                % plotter
+                obj.report(data);
+                drawnow
             end
-            % report function contains the actual logic of corresponding
-            % plotter
-            obj.report(data);
-            drawnow
             newData = data;
         end
         

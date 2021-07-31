@@ -11,6 +11,7 @@ classdef AutoEncoderExtractor < FeatureExtractor & LearnableInterface
         sampleRate = 2e6;   % sample rate of data to be processed [Hz]
         f_res = 100; % targeted frequency resolution [Hz]
         useSpectrum = false; % if set to true the input data from previous DataTransformer is converted into frequency spectrum in update step
+        meanMse = false;
     end
     
     methods
@@ -56,7 +57,11 @@ classdef AutoEncoderExtractor < FeatureExtractor & LearnableInterface
                data = p;
             end
             data_Pred = obj.autoencoder.predict(data);
-            newData = mean(SignalAnalysis.getMSE(data, data_Pred, 2));
+            if obj.meanMse
+                newData = mean(SignalAnalysis.getMSE(data, data_Pred, 2));
+            else
+                newData = SignalAnalysis.getMSE(data, data_Pred, 1)';
+            end
         end
     end
     
