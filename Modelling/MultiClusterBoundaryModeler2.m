@@ -57,6 +57,7 @@ classdef MultiClusterBoundaryModeler2 < Modeler
     methods (Access = private)
         function clusterer = createClusterer(obj)
             clusterer = ClusterBoundaryTracking2();
+            clusterer.autoEstimate = 'fit';
             clusterer.featureNames = {'MSE'};                      
         end
     end
