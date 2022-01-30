@@ -20,9 +20,17 @@ classdef RMSExtractor < FeatureExtractor
     methods
         %% - transform
         function newData = transform(obj, data)
-            %TRANSFORM(obj, data)
-            
-            newData = rms(data, 2);
+            %TRANSFORM(obj, data) 
+            if isscalar(data)
+                newData = rms(data);
+                warning('RMS feature applied on 1D data, is computing the absolute value')
+            elseif isvector(data)
+                newData = rms(data(:));
+            elseif ismatrix(data)                
+                newData = rms(data, 2);
+            else
+                error(['data input of type=' type(data) ' is not supported'])
+            end
         end
     end   
 end

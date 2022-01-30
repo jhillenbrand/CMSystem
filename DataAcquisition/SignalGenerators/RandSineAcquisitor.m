@@ -33,6 +33,11 @@ classdef RandSineAcquisitor < DataAcquisitor
             newData = obj.createRandSines(nSamples);
         end
         
+        function bool = isDataAvailable(obj)
+            %ISDATAAVAILABLE(obj)
+            bool = true;
+        end
+        
         function newData = createRandSines(obj, nSamples)
             if nargin < 2
                 newData = SignalAnalysis.createRandSines(obj.sampleRate, obj.maxSamples, obj.minSamples, obj.maxWaves, obj.maxAmpl, obj.maxNoise, obj.maxFreq);

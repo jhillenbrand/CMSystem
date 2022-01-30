@@ -7,9 +7,16 @@ classdef HoldOnPlotter < Plotter
     end
     
     methods
-        function obj = HoldOnPlotter()
-            %HOLDONPLOTTER
-            obj@Plotter(false, [class(HoldOnPlotter.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']']);
+        function obj = HoldOnPlotter(name, maxHoldOn)            
+            %HOLDONPLOTTER(name, maxHoldOn) 
+            if nargin < 2
+                maxHoldOn = 1000;
+            end
+            if nargin < 1
+                name = [class(HoldOnPlotter.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'];
+            end
+            obj@Plotter(false, name);
+            obj.maxHoldOn = maxHoldOn;
             % preset holdOnCount to maxHoldOn to make sure plot is cleaned
             %   on first plot cmd
             obj.holdOnCount = obj.maxHoldOn + 1;
@@ -68,7 +75,7 @@ classdef HoldOnPlotter < Plotter
         
         function plot2D(obj, data)  
             sz = 40;
-            lw = 1.5;
+            lw = 1;
             edgeColor = [0 0 0];
             faceColor = P.bluegreen;
             if obj.maxHoldOn > obj.holdOnCount

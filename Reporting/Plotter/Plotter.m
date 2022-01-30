@@ -6,6 +6,9 @@ classdef Plotter < Reporter
         numOfDataPoints = 0;
         docked = true;
         noFocus = true;
+        xAxisLimits = [];
+        yAxisLimits = [];
+        zAxisLimits = [];
         axisLabels = {};
         legends = {}
     end
@@ -79,9 +82,43 @@ classdef Plotter < Reporter
                 else
                     figure(obj.F);
                 end
+                
                 % report function contains the actual logic of corresponding
-                % plotter
+                % plotter                
                 obj.report(data);
+                
+                % set axis labels and legends if given
+                if DataTransformer.is1D(data)
+                    if ~isempty(obj.axisLabels)
+                        ylabel(obj.axisLabels{1});
+                    end
+                elseif DataTransformer.is2D(data)
+                    if ~isempty(obj.axisLabels)
+                        xlabel(obj.axisLabels{1});
+                        ylabel(obj.axisLabels{2});
+                    end
+                elseif DataTransformer.is3D(data)
+                    if ~isempty(obj.axisLabels)
+                        xlabel(obj.axisLabels{1});
+                        ylabel(obj.axisLabels{2});
+                        zlabel(obj.axisLabels{3});
+                    end
+                end
+                if ~isempty(obj.legends)
+                    legend(obj.legends);
+                end
+                
+                % set axis limits if available
+                if ~isempty(obj.xAxisLimits)
+                    xlim(obj.xAxisLimits);
+                end
+                if ~isempty(obj.yAxisLimits)
+                    ylim(obj.yAxisLimits);
+                end
+                if ~isempty(obj.zAxisLimits)
+                    zlim(obj.zAxisLimits);
+                end
+                
                 drawnow
             end
             newData = data;
@@ -90,28 +127,28 @@ classdef Plotter < Reporter
         function report(obj, data)
             if DataTransformer.is1D(data)
                 P.plot1DFeatures(data);
-                if ~isempty(obj.axisLabels)
-                    ylabel(obj.axisLabels{1});
-                end
+                %if ~isempty(obj.axisLabels)
+                %    ylabel(obj.axisLabels{1});
+                %end
             elseif DataTransformer.is2D(data)
                 P.plot2DFeatures(data);
-                if ~isempty(obj.axisLabels)
-                    xlabel(obj.axisLabels{1});
+                %if ~isempty(obj.axisLabels)
+                %    xlabel(obj.axisLabels{1});
                     ylabel(obj.axisLabels{2});
-                end
+                %end
             elseif DataTransformer.is3D(data)
                 P.plot3DFeatures(data); 
-                if ~isempty(obj.axisLabels)
-                    xlabel(obj.axisLabels{1});
-                    ylabel(obj.axisLabels{2});
-                    zlabel(obj.axisLabels{3});
-                end
+                %if ~isempty(obj.axisLabels)
+                %    xlabel(obj.axisLabels{1});
+                %    ylabel(obj.axisLabels{2});
+                %    zlabel(obj.axisLabels{3});
+                %end
             else
                 size(data)
                 error('dimensions of data are not supported for plotting');
             end
             if ~isempty(obj.legends)
-                legend(obj.legends);
+            %    legend(obj.legends);
             end
         end
     end
