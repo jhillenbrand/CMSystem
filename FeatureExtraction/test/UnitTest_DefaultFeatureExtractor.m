@@ -2,6 +2,9 @@
 rsDAQ = RandSineAcquisitor();
 
 %%
+pl = Plotter();
+
+%%
 prePro = DefaultPreprocessor();
 
 %%
@@ -18,6 +21,7 @@ plotter = HoldOnPlotter();
 
 %%
 rsDAQ.addObserver(prePro);
+rsDAQ.addObserver(pl);
 prePro.addObserver(fwSeg);
 fwSeg.addObserver(ex);
 ex.addObserver(plotter);
