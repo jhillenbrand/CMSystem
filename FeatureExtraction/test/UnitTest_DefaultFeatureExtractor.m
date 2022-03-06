@@ -31,7 +31,7 @@ w = 0;
 while (true)
     w = w + 1;
     rsDAQ.update([]);
-    
+     
     if w > 100
         prePro.disable();
     end
