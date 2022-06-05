@@ -12,9 +12,12 @@ classdef ClusteringPlotter < Plotter
     end
     
     methods
-        function obj = ClusteringPlotter()
+        function obj = ClusteringPlotter(name)
             %ClusteringPlotter
-            obj@Plotter(false, [class(ClusteringPlotter.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']']);
+            if nargin < 1
+                name = [class(ClusteringPlotter.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'];
+            end
+            obj@Plotter(false, name);
         end
     end
     

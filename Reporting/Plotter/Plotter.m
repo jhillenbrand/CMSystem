@@ -90,7 +90,12 @@ classdef Plotter < Reporter
                 % set axis labels and legends if given
                 if DataTransformer.is1D(data)
                     if ~isempty(obj.axisLabels)
-                        ylabel(obj.axisLabels{1});
+                        if (length(obj.axisLabels) > 1)
+                            xlabel(obj.axisLabels{1});
+                            ylabel(obj.axisLabels{2});
+                        else
+                            ylabel(obj.axisLabels{1});
+                        end
                     end
                 elseif DataTransformer.is2D(data)
                     if ~isempty(obj.axisLabels)

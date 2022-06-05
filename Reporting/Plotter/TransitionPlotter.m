@@ -9,9 +9,12 @@ classdef TransitionPlotter < Plotter
     end
     
     methods
-        function obj = TransitionPlotter()
+        function obj = TransitionPlotter(name)
             %TransitionPlotter
-            obj@Plotter(false, [class(TransitionPlotter.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']']);
+            if nargin < 1
+                name = [class(TransitionPlotter.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'];
+            end
+            obj@Plotter(false, name);
         end
     end
     

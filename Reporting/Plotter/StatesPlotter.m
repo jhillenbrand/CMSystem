@@ -6,9 +6,12 @@ classdef StatesPlotter < Plotter
     %StatesPlotter 
        
     methods
-        function obj = StatesPlotter()
+        function obj = StatesPlotter(name)
             %StatesPlotter
-            obj@Plotter(false, [class(StatesPlotter.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']']);
+            if nargin < 1
+                name = [class(StatesPlotter.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']'];
+            end
+            obj@Plotter(false, name);
         end
     end
     
