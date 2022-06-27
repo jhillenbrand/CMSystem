@@ -36,7 +36,7 @@ classdef ClusteringPlotter < Plotter
                             data.plotClustering()
                         
                         subplot(2, 1, 2)
-                            X = data.lastClustering.dataPoints;
+                             X = data.lastClustering.dataPoints;
                             len = size(X, 1);
                             li = obj.labelInds(1 : len);
                             u = unique(li);

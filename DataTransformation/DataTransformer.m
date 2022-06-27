@@ -42,7 +42,15 @@ classdef DataTransformer < DataTransformerInterface
                     obj.dataBuffer = transformedData;
                 end
             end
-            obj.transfer(transformedData);
+            %if isnumeric(transformedData)
+            %    if sum(isnan(transformedData)) ~= length(transformedData)
+            %        obj.transfer(transformedData);
+            %    else
+            %        warning('transformed data only returned NaN');
+            %    end
+            %else
+                obj.transfer(transformedData);
+            %end
             obj.isActive = false;
         end
         
