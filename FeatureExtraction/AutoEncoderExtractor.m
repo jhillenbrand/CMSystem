@@ -53,7 +53,7 @@ classdef AutoEncoderExtractor < FeatureExtractor & LearnableInterface
             
             % convert to spectrum if required
             if obj.useSpectrum
-               [f, p] = SignalAnalysis.fftPowerSpectrum(data, obj.sampleRate);
+               [f, p] = SignalAnalysis.fftAmplitudeSpectrum(data, obj.sampleRate);
                data = p;
             end
             data_Pred = obj.autoencoder.predict(data);
