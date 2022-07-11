@@ -53,7 +53,7 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
             if isempty(aeData)
                 newData = [];
             else                
-                [f, p] = SignalAnalysis.fftPowerSpectrum(aeData, obj.sampleRate);
+                [f, p] = SignalAnalysis.fftAmplitudeSpectrum(aeData, obj.sampleRate);
                 data_Pred = aen.predict(p);
                 if obj.mseMean
                     mse = mean(SignalAnalysis.getMSE(p, data_Pred, 1));
@@ -183,7 +183,7 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
                     ld = obj.learningData{speedInd, 1};
                     % determine hidden layer 
                     dw = SignalAnalysis.separateDataIntoWindows(ld, segN, true);
-                    [f, p, t] = SignalAnalysis.fftPowerSpectrum(dw, obj.sampleRate);
+                    [f, p, t] = SignalAnalysis.fftAmplitudeSpectrum(dw, obj.sampleRate);
                     pMean = mean(p, 2);
                     [locs, peaks, numOfPeaks] = PeakFinder.peaksByKneePointSearch(f, pMean, obj.f_res, false, 2);
                     % init autoencoder

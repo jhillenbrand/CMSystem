@@ -6,11 +6,12 @@ classdef AEPLCSimStreamPlotter < Plotter
     end
     
     methods
-        function obj = AEPLCSimStreamPlotter()
+        function obj = AEPLCSimStreamPlotter(name)
             %SIMSTREAMFILEPLOTTER
-            obj@Plotter(false, [class(AEPLCSimStreamPlotter.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']']);
-            obj.legends = {'AE [bit]', 'Speed [1/min]'};
-            obj.axisLabels = {'TIME UTC [ms]', 'AE [bit]', 'Speed [1/min]'};
+            obj@Plotter(false, name);
+            %[class(AEPLCSimStreamPlotter.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']']);
+            obj.legends = {'Samples [-]', 'Spannung in [mV]'};
+            obj.axisLabels = {'Zeit UTC [ms]', 'Spannung [mV]', 'Drehzahl [1/min]'};
         end
     end
     

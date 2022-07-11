@@ -10,9 +10,10 @@ classdef MultiStatePlotter < Plotter
     end
     
     methods
-        function obj = MultiStatePlotter()
+        function obj = MultiStatePlotter(name)
             %MultiStatePlotter 
-            obj@Plotter(false, [class(MultiStatePlotter.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']']);      
+            obj@Plotter(false, name);
+            %[class(MultiStatePlotter.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']']);      
         end
     end
     

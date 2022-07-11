@@ -10,9 +10,9 @@ classdef MultiClusterPlotter2 < Plotter
     end
     
     methods
-        function obj = MultiClusterPlotter2()
+        function obj = MultiClusterPlotter2(name)
             %MultiClusterPlotter 
-            obj@Plotter(false, [class(MultiClusterPlotter2.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']']);      
+            obj@Plotter(false, name);      
         end
     end
     
