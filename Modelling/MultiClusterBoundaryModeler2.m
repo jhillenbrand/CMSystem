@@ -3,6 +3,7 @@ classdef MultiClusterBoundaryModeler2 < Modeler
         
     properties
         boundaryClusterers = {};
+        minDataPoints = 25;
     end
     
     methods
@@ -57,6 +58,7 @@ classdef MultiClusterBoundaryModeler2 < Modeler
     methods (Access = private)
         function clusterer = createClusterer(obj)
             clusterer = ClusterBoundaryTracking2();
+            clusterer.minDataPoints = obj.minDataPoints;
             clusterer.autoEstimate = 'fit';
             clusterer.featureNames = {'MSE'};                      
         end

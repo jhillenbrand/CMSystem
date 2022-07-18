@@ -55,7 +55,7 @@ classdef SpeedBasedAENExtractor < FeatureExtractor & LearnableInterface
             else                
                 [f, p] = SignalAnalysis.fftAmplitudeSpectrum(aeData, obj.sampleRate);
                 data_Pred = aen.predict(p);
-                if obj.mseMean
+                 if obj.mseMean
                     mse = mean(SignalAnalysis.getMSE(p, data_Pred, 1));
                 else                    
                     mse = SignalAnalysis.getMSE(p, data_Pred, 1);

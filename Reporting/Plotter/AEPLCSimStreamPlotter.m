@@ -10,8 +10,8 @@ classdef AEPLCSimStreamPlotter < Plotter
             %SIMSTREAMFILEPLOTTER
             obj@Plotter(false, name);
             %[class(AEPLCSimStreamPlotter.empty) ' [' char(java.util.UUID.randomUUID().toString()) ']']);
-            obj.legends = {'Samples [-]', 'Spannung in [mV]'};
-            obj.axisLabels = {'Zeit UTC [ms]', 'Spannung [mV]', 'Drehzahl [1/min]'};
+            obj.legends = {'AE', 'Drehzahl'};
+            obj.axisLabels = {'Zeit UTC [ms]', 'Spannung [mV]', 'Vorschub [mm/s]'};
         end
     end
     
