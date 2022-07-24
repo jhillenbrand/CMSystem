@@ -52,7 +52,7 @@ classdef AEPreprocessor < Preprocessor
                 newData = newData(trimStart : end, :);
             end
             if trimEnd > 0
-                newData = newData(end - trimEnd : end, :);
+                newData = newData(1 : end - trimEnd, :);
             end
             if bitPrecision > 0
                 newData = SignalAnalysis.correctBitHickup(newData, bitPrecision, true, false);
