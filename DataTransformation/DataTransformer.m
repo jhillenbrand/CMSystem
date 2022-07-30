@@ -143,6 +143,15 @@ classdef DataTransformer < DataTransformerInterface
             %   collection
             obj.observers = [obj.observers; observer];
         end
+
+        function removeObserver(obj, name)
+            for o = 1 : length(obj.observers)
+                if strcmp(obj.observers(o, 1).name, name)
+                    obj.observers(o, :) = [];
+                    break;
+                end
+            end
+        end
         
         %% - setDataPersistent
         function setDataPersistent(obj, value)
